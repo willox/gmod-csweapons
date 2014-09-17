@@ -1,0 +1,14 @@
+{
+	"folders":
+	[
+		{
+			"path": "lua/autorun",
+			"name": "Autorun"
+		},
+
+		{
+			"path": "lua/weapons",
+			"name": "Weapons"
+		}
+	]
+}

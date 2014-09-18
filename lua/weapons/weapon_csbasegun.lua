@@ -1,8 +1,6 @@
 AddCSLuaFile()
 
-SWEP.Base = "weapon_csbase"
-
-DEFINE_BASECLASS( SWEP.Base )
+DEFINE_BASECLASS( "weapon_csbase" )
 
 SWEP.Spawnable = false
 SWEP.UseHands = true

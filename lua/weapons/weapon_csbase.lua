@@ -101,7 +101,7 @@ function SWEP:KickBack( up_base, lateral_base, up_modifier, lateral_modifier, up
 		I don't know if the guy that made this was a genius or..
 	]]
 	
-	if math.Round( util.SharedRandom( "KickBack" , 0 , direction_change ) ) == 0 then
+	if math.floor( util.SharedRandom( "KickBack" , 0 , direction_change ) ) == 0 then
 		self:SetDirection( 1 - self:GetDirection() )
 	end
 	

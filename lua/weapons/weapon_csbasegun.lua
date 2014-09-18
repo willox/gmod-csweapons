@@ -13,6 +13,10 @@ end
 function SWEP:SetupDataTables()
 	BaseClass.SetupDataTables( self )
 	
-	self:NetworkVar( "Float" , 4 , "ZoomFullyActiveTime" )
+	self:NetworkVar( "Float" , 5 , "ZoomFullyActiveTime" )
 	
+end
+
+function SWEP:DoFireEffects()
+	self:GetOwner():MuzzleFlash()
 end

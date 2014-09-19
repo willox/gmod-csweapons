@@ -3,6 +3,7 @@ AddCSLuaFile()
 SWEP.Spawnable = false
 SWEP.UseHands = true
 SWEP.DrawAmmo = true
+SWEP.Category = "Counter Strike: Source"
 
 function SWEP:Initialize()
 	self:SetHoldType( "normal" )
@@ -14,13 +15,25 @@ end
 	loads the keyvalues data from the files in the data folder and then sets the appropriate values on the weapon table,
 	the parsed table can then be accessed with self:GetWeaponInfo()
 	
-	NOTE: this function should be called right after AddCSLuaFile() on the SWEP object
-	
-	
+	NOTE:	this function should be called right after AddCSLuaFile() on the SWEP object
+			see ak47
 ]]
 
 function SWEP:ParseWeaponInfo( classname )
+	assert( type( classname ) == "string" , "ClassName was not a string!" )
 	--TODO
+	local wepinfo = file.Read( classname..".txt" , "DATA" )
+	
+	assert( wepinfo , "Could not read "..classname..".txt" )
+	
+	local wepinfotab = util.KeyValuesToTable( wepinfo )
+	if CLIENT then
+		PrintTable( wepinfotab )
+	end
+	
+	--NOTE: when setting the viewmodel string, automatically convert it to the c_ model
+	
+	--Jvs: have fun Willox, I can't be arsed
 end
 
 --[[
@@ -131,10 +144,12 @@ function SWEP:Think()
 		return
 	end
 	
-	--Jvs:	this is where the reload actually ends, this might be moved into its own function so other coders
-	--		can add other behaviours ( such as cs:go finishing the reload with a different delay, based on when the 
-	--		magazine actually gets inserted )
-	
+	--[[
+		Jvs:
+			this is where the reload actually ends, this might be moved into its own function so other coders
+			can add other behaviours ( such as cs:go finishing the reload with a different delay, based on when the 
+			magazine actually gets inserted )
+	]]
 	if self:InReload() and self:GetNextPrimaryAttack() <= CurTime() then
 		-- complete the reload. 
 		local j = math.min( self:GetMaxClip1() - self:Clip1(), pPlayer:GetAmmoCount( self:GetPrimaryAmmoType() ) )

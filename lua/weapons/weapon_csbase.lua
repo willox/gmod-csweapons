@@ -27,13 +27,21 @@ function SWEP:ParseWeaponInfo( classname )
 	assert( wepinfo , "Could not read "..classname..".txt" )
 	
 	local wepinfotab = util.KeyValuesToTable( wepinfo )
+	
+	self._WeaponInfo = wepinfotab
+	
 	if CLIENT then
-		PrintTable( wepinfotab )
+		PrintTable( self._WeaponInfo )
 	end
 	
-	--NOTE: when setting the viewmodel string, automatically convert it to the c_ model
+	--[[
+		Jvs: have fun Willox, I can't be arsed
+		game/shared/cstrike/cs_weapon_parse.cpp
+		void CCSWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
+	]]
 	
-	--Jvs: have fun Willox, I can't be arsed
+	--TODO: apply some necessary keyvalues from the weapon info to self, such as self.Primary.ClipSize and shit
+	--NOTE: when setting the viewmodel string, automatically convert it to the c_ model
 end
 
 --[[
@@ -41,7 +49,7 @@ end
 	some of this data is already applied to the weapon table ( such as .Slot, .PrintName and etc )
 ]]
 function SWEP:GetWeaponInfo()
-	--TODO
+	return self._WeaponInfo
 end
 
 function SWEP:SetupDataTables()
@@ -220,7 +228,11 @@ end
 
 --TODO: use getweaponinfo and shit to emit the sound here
 function SWEP:WeaponSound( soundtype )
-
+	local sndname = nil
+	
+	if sndname then
+		self:EmitSound( sndname , nil , nil , nil , CHAN_AUTO )
+	end
 end
 
 function SWEP:PlayEmptySound()

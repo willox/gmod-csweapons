@@ -5,34 +5,43 @@ SWEP.UseHands = true
 SWEP.DrawAmmo = true
 SWEP.Category = "Counter Strike: Source"
 
+if CLIENT then
+	SWEP.CrosshairDistance = 0
+end
+
 function SWEP:Initialize()
 	self:SetHoldType( "normal" )
 	self:SetDelayFire( true )
+	
+	self:SetWeaponType( self.WeaponTypeToString[self:GetWeaponInfo().WeaponType] )
 end
+
+SWEP.WeaponTypeToString = {
+	Knife = CS_WEAPONTYPE_KNIFE,
+	Pistol = CS_WEAPONTYPE_PISTOL,
+	Rifle = CS_WEAPONTYPE_RIFLE,
+	Shotgun = CS_WEAPONTYPE_SHOTGUN,
+	SniperRifle = CS_WEAPONTYPE_SNIPER_RIFLE,
+	SubMachineGun = CS_WEAPONTYPE_SUBMACHINEGUN,
+	Machinegun = CS_WEAPONTYPE_MACHINEGUN,
+	C4 = CS_WEAPONTYPE_C4,
+	Grenade = CS_WEAPONTYPE_GRENADE,
+}
+
 
 
 --[[
-	loads the keyvalues data from the files in the data folder and then sets the appropriate values on the weapon table,
-	the parsed table can then be accessed with self:GetWeaponInfo()
+	load the keyvalues from a string and parses it
 	
 	NOTE:	this function should be called right after AddCSLuaFile() on the SWEP object
 			see ak47
 ]]
 
-function SWEP:ParseWeaponInfo( classname )
-	assert( type( classname ) == "string" , "ClassName was not a string!" )
-	--TODO
-	local wepinfo = file.Read( classname..".txt" , "DATA" )
+function SWEP:ParseWeaponInfo( str )
 	
-	assert( wepinfo , "Could not read "..classname..".txt" )
-	
-	local wepinfotab = util.KeyValuesToTable( wepinfo )
+	local wepinfotab = util.KeyValuesToTable( str, nil , true )
 	
 	self._WeaponInfo = wepinfotab
-	
-	if CLIENT then
-		PrintTable( self._WeaponInfo )
-	end
 	
 	--[[
 		Jvs: have fun Willox, I can't be arsed
@@ -40,8 +49,33 @@ function SWEP:ParseWeaponInfo( classname )
 		void CCSWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
 	]]
 	
-	--TODO: apply some necessary keyvalues from the weapon info to self, such as self.Primary.ClipSize and shit
-	--NOTE: when setting the viewmodel string, automatically convert it to the c_ model
+	
+	self.PrintName = self._WeaponInfo.printname
+	
+	self.CSMuzzleFlashes = true
+	
+	if self._WeaponInfo.MuzzleFlashStyle == "CS_MUZZLEFLASH_X" then
+		self.CSMuzzleX = true
+	end
+	
+	self.Primary.Automatic = self._WeaponInfo.FullAuto
+	self.Primary.ClipSize = self._WeaponInfo.clip_size
+	self.Primary.Ammo = self._WeaponInfo.primary_ammo
+	self.Primary.DefaultClip = 0
+	
+	self.Secondary.Automatic = false
+	self.Secondary.ClipSize = -1
+	self.Secondary.DefaultClip = 0
+	self.Secondary.Ammo = -1
+	
+	self.ViewModelFlip = tobool( self._WeaponInfo.BuiltRightHanded )
+	
+	--TODO: when setting the viewmodel string, automatically convert it to the c_ model , willox pls, I'm not good with regex
+	self.ViewModel = self._WeaponInfo.viewmodel
+	
+	self.WorldModel = self._WeaponInfo.playermodel
+	
+	self.Weight = self._WeaponInfo.weight
 end
 
 --[[
@@ -73,6 +107,14 @@ function SWEP:Deploy()
 	self:SetNextDecreaseShotsFired( CurTime() )
 	self:SetShotsFired( 0 )
 	self:SetAccuracy( 0.2 )
+	
+	self:SendWeaponAnim( self:GetDeployActivity() )
+	self:SetNextPrimaryAttack( CurTime() + self:SequenceDuration() )
+	self:SetNextSecondaryAttack( CurTime() + self:SequenceDuration() )
+	
+	if IsValid( self:GetOwner() ) and self:GetOwner():IsPlayer() then
+		self:GetOwner():SetFOV( 0 , 0 )
+	end
 	
 	return true
 end
@@ -145,6 +187,14 @@ function SWEP:GetMaxClip2()
 	return self.Secondary.ClipSize
 end
 
+function SWEP:PrimaryAttack()
+
+end
+
+function SWEP:SecondaryAttack()
+
+end
+
 function SWEP:Think()
 	local pPlayer = self:GetOwner()
 
@@ -190,7 +240,7 @@ function SWEP:Think()
 		if self:IsPistol() then
 			self:SetShotsFired( 0 )
 		else
-			if self:GetShotsFired() > 0 && self:GetNextDecreaseShotsFired() < CurTime() then
+			if self:GetShotsFired() > 0 and self:GetNextDecreaseShotsFired() < CurTime() then
 				self:SetNextDecreaseShotsFired( CurTime() + 0.0225 )
 				self:SetShotsFired( self:GetShotsFired() - 1 )
 			end
@@ -207,7 +257,8 @@ function SWEP:Idle()
 end
 
 function SWEP:Holster()
-
+	
+	return true
 end
 
 function SWEP:InReload()
@@ -224,6 +275,14 @@ end
 
 function SWEP:IsSilenced()
 	return self:GetHasSilencer()
+end
+
+function SWEP:GetDeployActivity()
+	if self:IsSilenced() then
+		return ACT_VM_DRAW_SILENCED
+	else
+		return ACT_VM_DRAW
+	end
 end
 
 --TODO: use getweaponinfo and shit to emit the sound here
@@ -298,4 +357,146 @@ function SWEP:KickBack( up_base, lateral_base, up_modifier, lateral_modifier, up
 	end
 	
 	self:GetOwner():SetViewPunchAngles( angle )
+end
+
+if CLIENT then
+
+	function SWEP:DoDrawCrosshair( x , y )
+		--[[
+		local iDistance = self:GetWeaponInfo().CrosshairMinDistance -- The minimum distance the crosshair can achieve...
+		
+		local iDeltaDistance = self:GetWeaponInfo().CrosshairDeltaDistance -- Distance at which the crosshair shrinks at each step
+		
+		if cl_dynamiccrosshair:GetBool() then
+			if not self:GetOwner():OnGround() then
+				 iDistance *= 2.0
+			elseif self:GetOwner():Crouching() then
+				 iDistance *= 0.5
+			elseif self:GetOwner():GetAbsVelocity():Length() > 100 then
+				 iDistance *= 1.5
+			end
+		end
+	
+		
+		
+		if self.CrosshairDistance <= iDistance then
+			self.CrosshairDistance = self.CrosshairDistance - 0.1 + self.CrosshairDistance * 0.013
+		else
+			self.CrosshairDistance = math.min( 15, self.CrosshairDistance + iDeltaDistance )
+		end
+
+		
+		if self.CrosshairDistance < iDistance then
+			 self.CrosshairDistance = iDistance
+		end
+
+		--scale bar size to the resolution
+		local crosshairScale = cl_crosshairscale:GetInt()
+		if crosshairScale < 1 then
+			if ScrH() <= 600 then
+				crosshairScale = 600
+			elseif ScrH() <= 768 then
+				crosshairScale = 768
+			else
+				crosshairScale = 1200
+			end
+		end
+
+		local scale
+		if not cl_scalecrosshair:GetBool() then
+			scale = 1
+		else
+			scale = ScrH() / crosshairScale
+		end
+
+		local iCrosshairDistance = math.ceil( self.CrosshairDistance * scale )
+
+		local iBarSize = XRES(5) + (iCrosshairDistance - iDistance) / 2
+
+		iBarSize = math.max( 1, (int)( (float)iBarSize * scale ) )
+
+		local iBarThickness = max( 1, (int)floor( scale + 0.5f ) )
+
+		local	r, g, b
+		
+		if cl_crosshaircolor:GetInt() == 0 then
+			r = 50
+			g = 250
+			b = 50
+		elseif cl_crosshaircolor:GetInt() == 1 then
+			r = 250
+			g = 50
+			b = 50
+		if cl_crosshaircolor:GetInt() == 2 then
+			r = 50
+			g = 50
+			b = 250
+		if cl_crosshaircolor:GetInt() == 3 then
+			r = 250
+			g = 250
+			b = 50
+		if cl_crosshaircolor:GetInt() == 4 then
+			r = 50
+			g = 250
+			b = 250
+		else
+			r = 50
+			g = 250
+			b = 50
+		end
+		
+		
+		local alpha = math.Clamp( cl_crosshairalpha:GetInt(), 0, 255 )
+		surface.DrawSetColor( r, g, b, alpha )
+
+		if ( not m_iCrosshairTextureID )
+		{
+			CHudTexture *pTexture = gHUD.GetIcon( "whiteAdditive" )
+			if ( pTexture )
+			{
+				m_iCrosshairTextureID = pTexture->textureId
+			}
+		}
+
+		if not cl_crosshairusealpha:GetBool() then
+			surface.SetColor( r, g, b, 200 )
+			surface.SetTexture( m_iCrosshairTextureID )
+		end
+
+		local iHalfScreenWidth = ScrW() / 2
+		local iHalfScreenHeight = ScrH() / 2
+
+		local iLeft		= iHalfScreenWidth - ( iCrosshairDistance + iBarSize )
+		local iRight	= iHalfScreenWidth + iCrosshairDistance + iBarThickness
+		local iFarLeft	= iLeft + iBarSize
+		local iFarRight	= iRight + iBarSize
+
+		if not cl_crosshairusealpha.GetBool() && not pPlayer->m_bNightVisionOn then
+			-- Additive crosshair
+			surface.DrawTexturedRect( iLeft, iHalfScreenHeight, iFarLeft, iHalfScreenHeight + iBarThickness )
+			surface.DrawTexturedRect( iRight, iHalfScreenHeight, iFarRight, iHalfScreenHeight + iBarThickness )
+		else
+			-- Alpha-blended crosshair
+			vgui::surface()->DrawFilledRect( iLeft, iHalfScreenHeight, iFarLeft, iHalfScreenHeight + iBarThickness )
+			vgui::surface()->DrawFilledRect( iRight, iHalfScreenHeight, iFarRight, iHalfScreenHeight + iBarThickness )
+		end
+
+		local iTop		= iHalfScreenHeight - ( iCrosshairDistance + iBarSize )
+		local iBottom		= iHalfScreenHeight + iCrosshairDistance + iBarThickness
+		local iFarTop		= iTop + iBarSize
+		local iFarBottom	= iBottom + iBarSize
+
+		if !cl_crosshairusealpha.GetBool() and !pPlayer->m_bNightVisionOn then
+			-- Additive crosshair
+			vgui::surface()->DrawTexturedRect( iHalfScreenWidth, iTop, iHalfScreenWidth + iBarThickness, iFarTop )
+			vgui::surface()->DrawTexturedRect( iHalfScreenWidth, iBottom, iHalfScreenWidth + iBarThickness, iFarBottom )
+		else
+			-- Alpha-blended crosshair
+			vgui::surface()->DrawFilledRect( iHalfScreenWidth, iTop, iHalfScreenWidth + iBarThickness, iFarTop )
+			vgui::surface()->DrawFilledRect( iHalfScreenWidth, iBottom, iHalfScreenWidth + iBarThickness, iFarBottom )
+		end
+		]]
+		return true
+	end
+
 end

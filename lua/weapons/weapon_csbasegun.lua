@@ -6,6 +6,7 @@ SWEP.Spawnable = false
 SWEP.UseHands = true
 SWEP.DrawAmmo = true
 
+
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
 end
@@ -36,17 +37,17 @@ function SWEP:Think()
 	--Jvs: TODO, I don't know what this code actually does, but it seems important for their AWP crap to prevent accuracy exploits or some other shit
 	
 --[[
-	//GOOSEMAN : Return zoom level back to previous zoom level before we fired a shot. This is used only for the AWP.
-	// And Scout.
+	--GOOSEMAN : Return zoom level back to previous zoom level before we fired a shot. This is used only for the AWP.
+	-- And Scout.
 	if ( (m_flNextPrimaryAttack <= gpGlobals->curtime) && (pPlayer->m_bResumeZoom == TRUE) )
 	{
 #ifndef CLIENT_DLL
 		pPlayer->SetFOV( pPlayer, pPlayer->m_iLastZoom, 0.05f )
-		m_zoomFullyActiveTime = gpGlobals->curtime + 0.05f// Make sure we think that we are zooming on the server so we don't get instant acc bonus
+		m_zoomFullyActiveTime = gpGlobals->curtime + 0.05f-- Make sure we think that we are zooming on the server so we don't get instant acc bonus
 
 		if ( pPlayer->GetFOV() == pPlayer->m_iLastZoom )
 		{
-			// return the fade level in zoom.
+			-- return the fade level in zoom.
 			pPlayer->m_bResumeZoom = false
 		}
 #endif
@@ -83,7 +84,7 @@ function SWEP:BaseGunFire( spread , cycletime , primarymode )
 	self:SetDelayFire( true )
 	self:SetShotsFired( self:GetShotsFired() + 1 )
 	
-	// These modifications feed back into flSpread eventually.
+	-- These modifications feed back into flSpread eventually.
 	if pCSInfo.AccuracyDivisor ~= -1 then
 		local iShotsFired = self:GetShotsFired()
 
@@ -100,7 +101,7 @@ function SWEP:BaseGunFire( spread , cycletime , primarymode )
 		end
 	end
 
-	// Out of ammo?
+	-- Out of ammo?
 	if self:Clip1() <= 0 then
 		self:PlayEmptySound()
 		self:SetNextPrimaryAttack( CurTime() + 0.2 )
@@ -111,7 +112,7 @@ function SWEP:BaseGunFire( spread , cycletime , primarymode )
 
 	self:SetClip1( self:Clip1() -1 )
 
-	// player "shoot" animation
+	-- player "shoot" animation
 	pPlayer:DoAttackEvent()
 	
 	
@@ -166,7 +167,7 @@ if CLIENT then
 		if self:IsScoped() then
 			local screenWide, screenTall = ScrW() , ScrH()
 
-			// calculate the bounds in which we should draw the scope
+			-- calculate the bounds in which we should draw the scope
 			local inset = screenTall / 16
 			local y1 = inset
 			local x1 = (screenWide - screenTall) / 2 + inset 
@@ -203,35 +204,35 @@ if CLIENT then
 			
 			vgui::surface()->DrawSetColor(0,0,0,255)
 
-			//Draw the reticle with primitives
+			--Draw the reticle with primitives
 			vgui::surface()->DrawLine( 0, y, screenWide, y )
 			vgui::surface()->DrawLine( x, 0, x, screenTall )
 
-			//Draw the outline
+			--Draw the outline
 			vgui::surface()->DrawSetTexture( m_iScopeArcTexture )
 
-			// bottom right
+			-- bottom right
 			vert[0].Init( Vector2D( x, y ), uv11 )
 			vert[1].Init( Vector2D( x2, y ), uv21 )
 			vert[2].Init( Vector2D( x2, y2 ), uv22 )
 			vert[3].Init( Vector2D( x, y2 ), uv12 )
 			vgui::surface()->DrawTexturedPolygon( 4, vert )
 
-			// top right
+			-- top right
 			vert[0].Init( Vector2D( x - 1, y1 ), uv12 )
 			vert[1].Init( Vector2D ( x2, y1 ), uv22 )
 			vert[2].Init( Vector2D( x2, y + 1 ), uv21 )
 			vert[3].Init( Vector2D( x - 1, y + 1 ), uv11 )
 			vgui::surface()->DrawTexturedPolygon(4, vert)
 
-			// bottom left
+			-- bottom left
 			vert[0].Init( Vector2D( x1, y ), uv21 )
 			vert[1].Init( Vector2D( x, y ), uv11 )
 			vert[2].Init( Vector2D( x, y2 ), uv12 )
 			vert[3].Init( Vector2D( x1, y2), uv22 )
 			vgui::surface()->DrawTexturedPolygon(4, vert)
 
-			// top left
+			-- top left
 			vert[0].Init( Vector2D( x1, y1 ), uv22 )
 			vert[1].Init( Vector2D( x, y1 ), uv12 )
 			vert[2].Init( Vector2D( x, y ), uv11 )
@@ -239,10 +240,10 @@ if CLIENT then
 			
 			surface.DrawTexturedPolygon(4, vert)
 		
-			surface.DrawFilledRect(0, 0, screenWide, y1)				// top
-			surface.DrawFilledRect(0, y2, screenWide, screenTall)		// bottom
-			surface.DrawFilledRect(0, y1, x1, screenTall)				// left
-			surface.DrawFilledRect(x2, y1, screenWide, screenTall)	// right
+			surface.DrawFilledRect(0, 0, screenWide, y1)				-- top
+			surface.DrawFilledRect(0, y2, screenWide, screenTall)		-- bottom
+			surface.DrawFilledRect(0, y1, x1, screenTall)				-- left
+			surface.DrawFilledRect(x2, y1, screenWide, screenTall)	-- right
 			]]
 		end
 	end

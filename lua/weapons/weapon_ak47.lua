@@ -1,9 +1,9 @@
 AddCSLuaFile()
 DEFINE_BASECLASS( "weapon_csbasegun" )
 
+
 --Jvs: I wish this weapon defining shit was this easy
-SWEP:ParseWeaponInfo( [[
-WeaponData
+CSParseWeaponInfo( SWEP , [[WeaponData
 {
 	"MaxPlayerSpeed"		"221"
 	"WeaponType"			"Rifle"
@@ -122,6 +122,11 @@ WeaponData
 
 SWEP.Spawnable = true
 
+function SWEP:Initialize()
+	BaseClass.Initialize( self )
+	self:SetHoldType( "ar2" )
+end
+
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
 	
@@ -129,7 +134,7 @@ function SWEP:PrimaryAttack()
 	
 	if not self:GetOwner():OnGround() then
 		self:GunFire( 0.04 + 0.4 * self:GetAccuracy() )
-	elseif self:Getowner():GetAbsVelocity():Length2D() > 140 then
+	elseif self:GetOwner():GetAbsVelocity():Length2D() > 140 then
 		self:GunFire( 0.04 + 0.07 * self:GetAccuracy() )
 	else
 		self:GunFire( 0.0275 * self:GetAccuracy() )

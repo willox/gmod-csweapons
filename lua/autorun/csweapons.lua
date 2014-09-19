@@ -144,3 +144,53 @@ game.AddAmmoType {
 	minsplash = 4,
 	maxsplash = 8
 }
+
+--[[
+	load the keyvalues from a string and parses it
+	
+	NOTE:	this function should be called right after AddCSLuaFile() on the SWEP object
+			see ak47
+]]
+
+function CSParseWeaponInfo( self,  str )
+	
+	local wepinfotab = util.KeyValuesToTable( str, nil , true )
+	
+	self._WeaponInfo = wepinfotab
+	
+	--[[
+		Jvs: have fun Willox, I can't be arsed
+		game/shared/cstrike/cs_weapon_parse.cpp
+		void CCSWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
+	]]
+	
+	
+	self.PrintName = self._WeaponInfo.printname
+	
+	self.CSMuzzleFlashes = true
+	
+	if self._WeaponInfo.MuzzleFlashStyle == "CS_MUZZLEFLASH_X" then
+		self.CSMuzzleX = true
+	end
+	
+	self.Primary.Automatic = self._WeaponInfo.FullAuto
+	self.Primary.ClipSize = self._WeaponInfo.clip_size
+	self.Primary.Ammo = self._WeaponInfo.primary_ammo
+	self.Primary.DefaultClip = 0
+	
+	self.Secondary.Automatic = false
+	self.Secondary.ClipSize = -1
+	self.Secondary.DefaultClip = 0
+	self.Secondary.Ammo = -1
+	
+	--self.ViewModelFlip = self._WeaponInfo.BuiltRightHanded == 0
+	self.ViewModelFOV = 45
+	
+	--TODO: when setting the viewmodel string, automatically convert it to the c_ model , willox pls, I'm not good with regex
+	self.ViewModel = self._WeaponInfo.viewmodel
+	self.ViewModel = self.ViewModel:Replace( "/v_" , "/cstrike/c_" ) 
+	
+	self.WorldModel = self._WeaponInfo.playermodel
+	
+	self.Weight = self._WeaponInfo.weight
+end

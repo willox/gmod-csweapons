@@ -28,56 +28,6 @@ SWEP.WeaponTypeToString = {
 	Grenade = CS_WEAPONTYPE_GRENADE,
 }
 
-
-
---[[
-	load the keyvalues from a string and parses it
-	
-	NOTE:	this function should be called right after AddCSLuaFile() on the SWEP object
-			see ak47
-]]
-
-function SWEP:ParseWeaponInfo( str )
-	
-	local wepinfotab = util.KeyValuesToTable( str, nil , true )
-	
-	self._WeaponInfo = wepinfotab
-	
-	--[[
-		Jvs: have fun Willox, I can't be arsed
-		game/shared/cstrike/cs_weapon_parse.cpp
-		void CCSWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
-	]]
-	
-	
-	self.PrintName = self._WeaponInfo.printname
-	
-	self.CSMuzzleFlashes = true
-	
-	if self._WeaponInfo.MuzzleFlashStyle == "CS_MUZZLEFLASH_X" then
-		self.CSMuzzleX = true
-	end
-	
-	self.Primary.Automatic = self._WeaponInfo.FullAuto
-	self.Primary.ClipSize = self._WeaponInfo.clip_size
-	self.Primary.Ammo = self._WeaponInfo.primary_ammo
-	self.Primary.DefaultClip = 0
-	
-	self.Secondary.Automatic = false
-	self.Secondary.ClipSize = -1
-	self.Secondary.DefaultClip = 0
-	self.Secondary.Ammo = -1
-	
-	self.ViewModelFlip = tobool( self._WeaponInfo.BuiltRightHanded )
-	
-	--TODO: when setting the viewmodel string, automatically convert it to the c_ model , willox pls, I'm not good with regex
-	self.ViewModel = self._WeaponInfo.viewmodel
-	
-	self.WorldModel = self._WeaponInfo.playermodel
-	
-	self.Weight = self._WeaponInfo.weight
-end
-
 --[[
 	returns the raw data parsed from the vdf in table form,
 	some of this data is already applied to the weapon table ( such as .Slot, .PrintName and etc )
@@ -161,7 +111,7 @@ function SWEP:MainReload( act )
 		return false
 	end
 	
-	self:WeaponSound( "RELOAD" )
+	self:WeaponSound( "reload" )
 
 	self:SendWeaponAnim( act )
 
@@ -287,7 +237,9 @@ end
 
 --TODO: use getweaponinfo and shit to emit the sound here
 function SWEP:WeaponSound( soundtype )
-	local sndname = nil
+	if not self:GetWeaponInfo() then return end
+	
+	local sndname = self:GetWeaponInfo().SoundData[soundtype]
 	
 	if sndname then
 		self:EmitSound( sndname , nil , nil , nil , CHAN_AUTO )

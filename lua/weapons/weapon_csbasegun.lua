@@ -169,7 +169,7 @@ end
 
 if CLIENT then
 	
-	SWEP.ScopeArcTexture = Material( "materials/gmod/scope.vmt" )
+	SWEP.ScopeArcTexture = Material( "gmod/scope.vmt" )
 	SWEP.ScopeDustTexture = Material( "" )
 	
 	--[[
@@ -203,6 +203,14 @@ if CLIENT then
 
 			local uv1 = 0.5 / 256
 			local uv2 = 1.0 - uv1
+			
+			
+			surface.SetDrawColor( color_black )
+			surface.SetMaterial( self.ScopeArcTexture )
+			surface.DrawTexturedRect( x - ( ScrH() / 2	) , 0 , ScrH() , ScrH() )
+			--Draw the reticle with primitives
+			surface.DrawLine( 0, y, screenWide, y )
+			surface.DrawLine( x, 0, x, screenTall )
 			--[[
 			vgui::Vertex_t vert[4]	
 			

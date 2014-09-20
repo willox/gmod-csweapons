@@ -7,6 +7,12 @@ SWEP.Category = "Counter Strike: Source"
 
 if CLIENT then
 	SWEP.CrosshairDistance = 0
+	local cl_crosshaircolor = CreateConVar( "cl_crosshaircolor", "0", FCVAR_ARCHIVE )
+	local cl_dynamiccrosshair = CreateConVar( "cl_dynamiccrosshair", "1", FCVAR_ARCHIVE )
+	local cl_scalecrosshair = CreateConVar( "cl_scalecrosshair", "1", FCVAR_ARCHIVE )
+	local cl_crosshairscale = CreateConVar( "cl_crosshairscale", "0", FCVAR_ARCHIVE )
+	local cl_crosshairalpha = CreateConVar( "cl_crosshairalpha", "200", FCVAR_ARCHIVE )
+	local cl_crosshairusealpha = CreateConVar( "cl_crosshairusealpha", "0", FCVAR_ARCHIVE )
 end
 
 function SWEP:Initialize()
@@ -312,20 +318,26 @@ function SWEP:KickBack( up_base, lateral_base, up_modifier, lateral_modifier, up
 end
 
 if CLIENT then
-
+	local cl_crosshaircolor = GetConVar( "cl_crosshaircolor" )
+	local cl_dynamiccrosshair = GetConVar( "cl_dynamiccrosshair" )
+	local cl_scalecrosshair = GetConVar( "cl_scalecrosshair" )
+	local cl_crosshairscale = GetConVar( "cl_crosshairscale" )
+	local cl_crosshairalpha = GetConVar( "cl_crosshairalpha" )
+	local cl_crosshairusealpha = GetConVar( "cl_crosshairusealpha" )
+	
 	function SWEP:DoDrawCrosshair( x , y )
-		--[[
+		
 		local iDistance = self:GetWeaponInfo().CrosshairMinDistance -- The minimum distance the crosshair can achieve...
 		
 		local iDeltaDistance = self:GetWeaponInfo().CrosshairDeltaDistance -- Distance at which the crosshair shrinks at each step
 		
 		if cl_dynamiccrosshair:GetBool() then
 			if not self:GetOwner():OnGround() then
-				 iDistance *= 2.0
+				 iDistance = iDistance * 2.0
 			elseif self:GetOwner():Crouching() then
-				 iDistance *= 0.5
+				 iDistance = iDistance * 0.5
 			elseif self:GetOwner():GetAbsVelocity():Length() > 100 then
-				 iDistance *= 1.5
+				 iDistance = iDistance * 1.5
 			end
 		end
 	
@@ -336,7 +348,7 @@ if CLIENT then
 		else
 			self.CrosshairDistance = math.min( 15, self.CrosshairDistance + iDeltaDistance )
 		end
-
+		
 		
 		if self.CrosshairDistance < iDistance then
 			 self.CrosshairDistance = iDistance
@@ -353,8 +365,9 @@ if CLIENT then
 				crosshairScale = 1200
 			end
 		end
-
+		
 		local scale
+		
 		if not cl_scalecrosshair:GetBool() then
 			scale = 1
 		else
@@ -362,14 +375,14 @@ if CLIENT then
 		end
 
 		local iCrosshairDistance = math.ceil( self.CrosshairDistance * scale )
+		
+		local iBarSize = ScreenScale( 5 ) + (iCrosshairDistance - iDistance) / 2
 
-		local iBarSize = XRES(5) + (iCrosshairDistance - iDistance) / 2
+		iBarSize = math.max( 1, iBarSize * scale )
+		
+		local iBarThickness = math.max( 1, math.floor( scale + 0.5 ) )
 
-		iBarSize = math.max( 1, (int)( (float)iBarSize * scale ) )
-
-		local iBarThickness = max( 1, (int)floor( scale + 0.5f ) )
-
-		local	r, g, b
+		local r, g, b
 		
 		if cl_crosshaircolor:GetInt() == 0 then
 			r = 50
@@ -379,15 +392,15 @@ if CLIENT then
 			r = 250
 			g = 50
 			b = 50
-		if cl_crosshaircolor:GetInt() == 2 then
+		elseif cl_crosshaircolor:GetInt() == 2 then
 			r = 50
 			g = 50
 			b = 250
-		if cl_crosshaircolor:GetInt() == 3 then
+		elseif cl_crosshaircolor:GetInt() == 3 then
 			r = 250
 			g = 250
 			b = 50
-		if cl_crosshaircolor:GetInt() == 4 then
+		elseif cl_crosshaircolor:GetInt() == 4 then
 			r = 50
 			g = 250
 			b = 250
@@ -397,10 +410,14 @@ if CLIENT then
 			b = 50
 		end
 		
-		
 		local alpha = math.Clamp( cl_crosshairalpha:GetInt(), 0, 255 )
-		surface.DrawSetColor( r, g, b, alpha )
-
+		surface.SetDrawColor( r, g, b, alpha )
+		
+		draw.NoTexture()
+		--surface.DrawRect( 0 , 0 , 1000 , 1000 )
+		
+		--[[
+		
 		if ( not m_iCrosshairTextureID )
 		{
 			CHudTexture *pTexture = gHUD.GetIcon( "whiteAdditive" )
@@ -409,45 +426,46 @@ if CLIENT then
 				m_iCrosshairTextureID = pTexture->textureId
 			}
 		}
+		]]
 
 		if not cl_crosshairusealpha:GetBool() then
-			surface.SetColor( r, g, b, 200 )
-			surface.SetTexture( m_iCrosshairTextureID )
+			surface.SetDrawColor( r, g, b, 200 )
+			--surface.SetTexture( m_iCrosshairTextureID )
 		end
 
-		local iHalfScreenWidth = ScrW() / 2
-		local iHalfScreenHeight = ScrH() / 2
+		local iHalfScreenWidth = 0
+		local iHalfScreenHeight = 0
 
 		local iLeft		= iHalfScreenWidth - ( iCrosshairDistance + iBarSize )
 		local iRight	= iHalfScreenWidth + iCrosshairDistance + iBarThickness
-		local iFarLeft	= iLeft + iBarSize
-		local iFarRight	= iRight + iBarSize
+		local iFarLeft	= iBarSize
+		local iFarRight	= iBarSize
 
-		if not cl_crosshairusealpha.GetBool() && not pPlayer->m_bNightVisionOn then
+		if not cl_crosshairusealpha:GetBool() then
 			-- Additive crosshair
-			surface.DrawTexturedRect( iLeft, iHalfScreenHeight, iFarLeft, iHalfScreenHeight + iBarThickness )
-			surface.DrawTexturedRect( iRight, iHalfScreenHeight, iFarRight, iHalfScreenHeight + iBarThickness )
+			surface.DrawTexturedRect( x + iLeft, y + iHalfScreenHeight, iFarLeft, iHalfScreenHeight + iBarThickness )
+			surface.DrawTexturedRect( x + iRight, y + iHalfScreenHeight, iFarRight, iHalfScreenHeight + iBarThickness )
 		else
 			-- Alpha-blended crosshair
-			vgui::surface()->DrawFilledRect( iLeft, iHalfScreenHeight, iFarLeft, iHalfScreenHeight + iBarThickness )
-			vgui::surface()->DrawFilledRect( iRight, iHalfScreenHeight, iFarRight, iHalfScreenHeight + iBarThickness )
+			surface.DrawRect( x + iLeft, y + iHalfScreenHeight, iFarLeft, iHalfScreenHeight + iBarThickness )
+			surface.DrawRect( x + iRight, y + iHalfScreenHeight, iFarRight, iHalfScreenHeight + iBarThickness )
 		end
-
+		
 		local iTop		= iHalfScreenHeight - ( iCrosshairDistance + iBarSize )
 		local iBottom		= iHalfScreenHeight + iCrosshairDistance + iBarThickness
-		local iFarTop		= iTop + iBarSize
-		local iFarBottom	= iBottom + iBarSize
+		local iFarTop		= iBarSize
+		local iFarBottom	= iBarSize
 
-		if !cl_crosshairusealpha.GetBool() and !pPlayer->m_bNightVisionOn then
+		if not cl_crosshairusealpha:GetBool() then
 			-- Additive crosshair
-			vgui::surface()->DrawTexturedRect( iHalfScreenWidth, iTop, iHalfScreenWidth + iBarThickness, iFarTop )
-			vgui::surface()->DrawTexturedRect( iHalfScreenWidth, iBottom, iHalfScreenWidth + iBarThickness, iFarBottom )
+			surface.DrawTexturedRect( x + iHalfScreenWidth, y + iTop, iHalfScreenWidth + iBarThickness, iFarTop )
+			surface.DrawTexturedRect( x + iHalfScreenWidth, y + iBottom, iHalfScreenWidth + iBarThickness, iFarBottom )
 		else
 			-- Alpha-blended crosshair
-			vgui::surface()->DrawFilledRect( iHalfScreenWidth, iTop, iHalfScreenWidth + iBarThickness, iFarTop )
-			vgui::surface()->DrawFilledRect( iHalfScreenWidth, iBottom, iHalfScreenWidth + iBarThickness, iFarBottom )
+			surface.DrawRect( x + iHalfScreenWidth, y + iTop, iHalfScreenWidth + iBarThickness, iFarTop )
+			surface.DrawRect( x + iHalfScreenWidth, y + iBottom, iHalfScreenWidth + iBarThickness, iFarBottom )
 		end
-		]]
+		
 		return true
 	end
 

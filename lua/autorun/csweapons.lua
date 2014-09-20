@@ -158,7 +158,7 @@ local wepinfo_meta = {
 
 	WeaponArmorRatio = 1,
 	CrosshairMinDistance = 4,
-	CrosshairDeltaDistance = 3
+	CrosshairDeltaDistance = 3,
 	CanEquipWithShield = false,
 	MuzzleFlashScale = 1,
 	MuzzleFlashStyle = "CS_MUZZLEFLASH_NORM",

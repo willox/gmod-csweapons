@@ -141,6 +141,27 @@ end
 
 --Jvs: there's LOTS of shit to do here, this'll have to wait until Willox finishes the weapon info parser
 function SWEP:FireCSSBullet( ang , primarymode , spread )
+
+	local ply = self:GetOwner()
+
+	local r = util.SharedRandom( "Spread" , 0, 2 * math.pi )
+
+	local x = math.sin( r ) * util.SharedRandom( "SpreadX" , 0, 0.5 )
+	local y = math.cos( r ) * util.SharedRandom( "SpreadY" , 0, 0.5 )
+
+	local dir = ang:Forward() +
+		x * spread * ang:Right() +
+		y * spread * ang:Up()
+
+	dir:Normalize()
+
+	ply:FireBullets {
+		Attacker = ply,
+		Src = ply:GetShootPos(),
+		Dir = dir,
+		Spread = Vector(0, 0, 0)
+	}
+
 end
 
 if CLIENT then

@@ -115,6 +115,7 @@ function SWEP:BaseGunFire( spread , cycletime , primarymode )
 	-- player "shoot" animation
 	pPlayer:DoAttackEvent()
 	
+	self:WeaponSound( "single_shot" )
 	
 	--Jvs: TODO
 	self:FireCSSBullet( pPlayer:EyeAngles() + 2 * pPlayer:GetViewPunchAngles() , primarymode , spread )

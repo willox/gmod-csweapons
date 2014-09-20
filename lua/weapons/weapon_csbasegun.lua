@@ -148,7 +148,7 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 	local r = util.SharedRandom( "Spread" , 0, 2 * math.pi )
 
 	local x = math.sin( r ) * util.SharedRandom( "SpreadX" , 0, 0.5 )
-	local y = math.cos( r ) * util.SharedRandom( "SpreadY" , 0, 0.5 )
+	local y = math.cos( r ) * util.SharedRandom( "SpreadY" , 0, 1 )
 
 	local dir = ang:Forward() +
 		x * spread * ang:Right() +

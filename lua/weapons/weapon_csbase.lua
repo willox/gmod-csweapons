@@ -5,6 +5,8 @@ SWEP.UseHands = true
 SWEP.DrawAmmo = true
 SWEP.Category = "Counter Strike: Source"
 
+SWEP.CSSWeapon = true
+
 if CLIENT then
 	SWEP.CrosshairDistance = 0
 	local cl_crosshaircolor = CreateConVar( "cl_crosshaircolor", "0", FCVAR_ARCHIVE )
@@ -316,6 +318,10 @@ function SWEP:KickBack( up_base, lateral_base, up_modifier, lateral_modifier, up
 	end
 	
 	self:GetOwner():SetViewPunchAngles( angle )
+end
+
+function SWEP:GetSpeedRatio()
+	return 1
 end
 
 if CLIENT then

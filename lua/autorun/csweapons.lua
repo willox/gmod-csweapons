@@ -157,14 +157,6 @@ function CSParseWeaponInfo( self,  str )
 	local wepinfotab = util.KeyValuesToTable( str, nil , true )
 	
 	self._WeaponInfo = wepinfotab
-	
-	--[[
-		Jvs: have fun Willox, I can't be arsed
-		game/shared/cstrike/cs_weapon_parse.cpp
-		void CCSWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
-	]]
-	
-	
 	self.PrintName = self._WeaponInfo.printname
 	
 	self.CSMuzzleFlashes = true
@@ -186,11 +178,17 @@ function CSParseWeaponInfo( self,  str )
 	--self.ViewModelFlip = self._WeaponInfo.BuiltRightHanded == 0
 	self.ViewModelFOV = 45
 	
-	--TODO: when setting the viewmodel string, automatically convert it to the c_ model , willox pls, I'm not good with regex
-	self.ViewModel = self._WeaponInfo.viewmodel
-	self.ViewModel = self.ViewModel:Replace( "/v_" , "/cstrike/c_" ) 
+	self.ViewModel = self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" ) 
 	
 	self.WorldModel = self._WeaponInfo.playermodel
 	
 	self.Weight = self._WeaponInfo.weight
 end
+
+hook.Add( "SetupMove" , "CSS - Speed Modify" , function( ply , mv , cmd )
+	local weapon = ply:GetActiveWeapon()
+	
+	if IsValid( weapon ) and weapon.CSSWeapon then
+		mv:SetMaxClientSpeed( mv:GetMaxClientSpeed() * weapon:GetSpeedRatio() )
+	end
+end)

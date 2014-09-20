@@ -20,10 +20,11 @@ function SWEP:SetupDataTables()
 	
 	--Jvs: stuff that is scattered around all the weapons code that I'm going to try and unify here
 	
-	self:NetworkVar( "Bool"	, 3 , "BurstFiring" )		--is currently burstfiring
+	self:NetworkVar( "Bool" , 3 , "BurstFireEnabled" )
 	self:NetworkVar( "Float" , 7 , "NextBurstFire" ) 	--when the next burstfire is gonna happen, same as nextprimaryattack
 	self:NetworkVar( "Float" , 8 , "BurstFireDelay" )	--the speed of the burst fire itself, 0.5 means two shots every second etc
 	self:NetworkVar( "Int" , 3 , "BurstFires" )			--goes from X to 0, how many burst fires we're going to do
+	self:NetworkVar( "Int" , 4 , "MaxBurstFires" )
 	self:NetworkVar( "Float" , 8 , "DoneSwitchingSilencer" )
 end
 
@@ -34,6 +35,8 @@ function SWEP:Deploy()
 end
 
 function SWEP:Think()
+	
+	
 	--Jvs: TODO, I don't know what this code actually does, but it seems important for their AWP crap to prevent accuracy exploits or some other shit
 	
 --[[
@@ -54,6 +57,28 @@ function SWEP:Think()
 	}
 ]]
 	BaseClass.Think( self )
+	
+	
+	if not self:InReload() and self:GetBurstFireEnabled() and self:GetNextBurstFire() < CurTime() and self:GetNextBurstFire() ~= -1 then
+		if self:GetBurstFires() < self:GetMaxBurstFires() then
+			
+			if self:Clip1() <= 0 then
+				self:SetBurstFires( self:GetMaxBurstFires() )
+			end
+			
+			local oldprimaryattack = self:GetNextPrimaryAttack()
+			
+			self:SetNextPrimaryAttack( CurTime() - 1 )
+			self:PrimaryAttack()
+			self:SetBurstFires( self:GetBurstFires() + 1 )
+		else
+			if self:GetNextBurstFire() < CurTime() and self:GetNextBurstFire() ~= -1 then
+				self:SetBurstFires( 0 )
+				self:SetNextBurstFire( -1 )
+				
+			end
+		end
+	end
 end
 
 function SWEP:DoFireEffects()
@@ -139,7 +164,16 @@ function SWEP:BaseGunFire( spread , cycletime , primarymode )
 	self:SetNextSecondaryAttack( CurTime() + cycletime )
 
 	self:SetNextIdle( CurTime() + pCSInfo.TimeToIdle )
+	if self:GetBurstFireEnabled() then
+		self:SetNextBurstFire( CurTime() + self:GetBurstFireDelay() )
+	else
+		self:SetNextBurstFire( -1 )
+	end
 	return true
+end
+
+function SWEP:ToggleBurstFire()
+	self:SetBurstFireEnabled( not self:GetBurstFireEnabled() )
 end
 
 --Jvs: there's LOTS of shit to do here, this'll have to wait until Willox finishes the weapon info parser
@@ -168,6 +202,15 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 end
 
 if CLIENT then
+	
+	function SWEP:GetTracerOrigin()
+		if IsValid( self:GetOwner() ) then
+			local viewmodel = self:GetOwner():GetViewModel( 0 )
+			local attch = viewmodel:GetAttachment( "2" )
+			if not attch then return end
+			return attch.Pos
+		end
+	end
 	
 	SWEP.ScopeArcTexture = Material( "gmod/scope.vmt" )
 	SWEP.ScopeDustTexture = Material( "" )

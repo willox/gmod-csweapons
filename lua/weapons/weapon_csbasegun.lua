@@ -118,7 +118,7 @@ function SWEP:BaseGunFire( spread , cycletime , primarymode )
 	self:WeaponSound( "single_shot" )
 	
 	--Jvs: TODO
-	self:FireCSSBullet( pPlayer:EyeAngles() + 2 * pPlayer:GetViewPunchAngles() , primarymode , spread )
+	self:FireCSSBullet( pPlayer:GetAimVector():Angle() + 2 * pPlayer:GetViewPunchAngles() , primarymode , spread )
 	
 	--[[
 	FX_FireBullets(

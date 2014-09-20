@@ -186,7 +186,7 @@ function SWEP:GunFire( spread , mode )
 		self:SetAccuracy( 0.6 )
 	end
 	
-	self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, mode  ) then
+	self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, mode  )
 end
 
 function SWEP:SecondaryAttack()

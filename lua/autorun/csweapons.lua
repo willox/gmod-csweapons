@@ -202,7 +202,7 @@ function CSParseWeaponInfo( self,  str )
 		self.CSMuzzleX = true
 	end
 	
-	self.Primary.Automatic = self._WeaponInfo.FullAuto
+	self.Primary.Automatic = tobool( tonumber( self._WeaponInfo.FullAuto ) )
 	self.Primary.ClipSize = self._WeaponInfo.clip_size
 	self.Primary.Ammo = self._WeaponInfo.primary_ammo
 	self.Primary.DefaultClip = 0

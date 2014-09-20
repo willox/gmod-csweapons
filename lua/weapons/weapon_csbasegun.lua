@@ -9,6 +9,8 @@ SWEP.DrawAmmo = true
 
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
+	
+	self:SetLastFire( CurTime() )
 end
 
 function SWEP:SetupDataTables()
@@ -26,11 +28,15 @@ function SWEP:SetupDataTables()
 	self:NetworkVar( "Int" , 3 , "BurstFires" )			--goes from X to 0, how many burst fires we're going to do
 	self:NetworkVar( "Int" , 4 , "MaxBurstFires" )
 	self:NetworkVar( "Float" , 8 , "DoneSwitchingSilencer" )
+	
+	self:NetworkVar( "Float" , 9 , "LastFire" )
 end
 
 function SWEP:Deploy()
 	self:SetDelayFire( false )
 	self:SetZoomFullyActiveTime( -1 )
+	self:SetAccuracy( 0.2 )
+	
 	return BaseClass.Deploy( self )
 end
 
@@ -60,22 +66,19 @@ function SWEP:Think()
 	
 	
 	if not self:InReload() and self:GetBurstFireEnabled() and self:GetNextBurstFire() < CurTime() and self:GetNextBurstFire() ~= -1 then
-		if self:GetBurstFires() < self:GetMaxBurstFires() then
-			
+		if self:GetBurstFires() < ( self:GetMaxBurstFires() -1 ) then
 			if self:Clip1() <= 0 then
 				self:SetBurstFires( self:GetMaxBurstFires() )
+			else
+				self:SetNextPrimaryAttack( CurTime() - 1 )
+				self:PrimaryAttack()
+				self:SetNextPrimaryAttack( CurTime() + 0.5 )
+				self:SetBurstFires( self:GetBurstFires() + 1 )
 			end
-			
-			local oldprimaryattack = self:GetNextPrimaryAttack()
-			
-			self:SetNextPrimaryAttack( CurTime() - 1 )
-			self:PrimaryAttack()
-			self:SetBurstFires( self:GetBurstFires() + 1 )
 		else
 			if self:GetNextBurstFire() < CurTime() and self:GetNextBurstFire() ~= -1 then
 				self:SetBurstFires( 0 )
 				self:SetNextBurstFire( -1 )
-				
 			end
 		end
 	end
@@ -135,7 +138,7 @@ function SWEP:BaseGunFire( spread , cycletime , primarymode )
 		return false
 	end
 
-	self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
+	self:SendWeaponAnim( self:GetFireActivity() )
 
 	self:SetClip1( self:Clip1() -1 )
 
@@ -173,6 +176,14 @@ function SWEP:BaseGunFire( spread , cycletime , primarymode )
 end
 
 function SWEP:ToggleBurstFire()
+	if IsValid( self:GetOwner() ) and self:GetOwner():IsPlayer() then
+		if self:GetBurstFireEnabled() then
+			self:GetOwner():PrintMessage( HUD_PRINTCENTER, "#Switch_To_SemiAuto" )
+		else
+			self:GetOwner():PrintMessage( HUD_PRINTCENTER, "#Switch_To_BurstFire" )
+		end
+	end
+	
 	self:SetBurstFireEnabled( not self:GetBurstFireEnabled() )
 end
 
@@ -198,7 +209,7 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 		Dir = dir,
 		Spread = Vector(0, 0, 0)
 	}
-
+	self:SetLastFire( CurTime() )
 end
 
 if CLIENT then

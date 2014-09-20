@@ -125,10 +125,6 @@ SWEP.Spawnable = true
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
 	self:SetHoldType( "ar2" )
-	
-	self:SetBurstFireEnabled( true )
-	self:SetBurstFireDelay( 0.1 )
-	self:SetMaxBurstFires( 3 )
 end
 
 function SWEP:PrimaryAttack()
@@ -143,15 +139,6 @@ function SWEP:PrimaryAttack()
 	else
 		self:GunFire( 0.0275 * self:GetAccuracy() )
 	end
-end
-
-
-function SWEP:SecondaryAttack()
-	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
-	self:PlayEmptySound()
-	self:ToggleBurstFire()
-	self:SetNextPrimaryAttack( CurTime() + 0.3 )
 end
 
 function SWEP:GunFire( spread )

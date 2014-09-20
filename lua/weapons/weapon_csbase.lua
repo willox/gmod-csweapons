@@ -64,7 +64,6 @@ end
 function SWEP:Deploy()
 	self:SetNextDecreaseShotsFired( CurTime() )
 	self:SetShotsFired( 0 )
-	self:SetAccuracy( 0.2 )
 	self:SetInReload( false )
 	
 	self:SendWeaponAnim( self:GetDeployActivity() )
@@ -242,6 +241,10 @@ function SWEP:GetDeployActivity()
 	else
 		return ACT_VM_DRAW
 	end
+end
+
+function SWEP:GetFireActivity()
+	return ACT_VM_PRIMARYATTACK
 end
 
 --TODO: use getweaponinfo and shit to emit the sound here

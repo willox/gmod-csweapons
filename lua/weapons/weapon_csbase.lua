@@ -63,6 +63,7 @@ function SWEP:Deploy()
 	self:SetNextDecreaseShotsFired( CurTime() )
 	self:SetShotsFired( 0 )
 	self:SetAccuracy( 0.2 )
+	self:SetInReload( false )
 	
 	self:SendWeaponAnim( self:GetDeployActivity() )
 	self:SetNextPrimaryAttack( CurTime() + self:SequenceDuration() )
@@ -213,7 +214,7 @@ function SWEP:Idle()
 end
 
 function SWEP:Holster()
-	
+	self:SetInReload( false )
 	return true
 end
 

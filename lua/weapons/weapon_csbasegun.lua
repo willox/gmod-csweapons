@@ -63,6 +63,8 @@ end
 function SWEP:Idle()
 	if CurTime() <= self:GetNextIdle() then return end
 	
+	if self:GetNextPrimaryAttack() > CurTime() or self:GetNextSecondaryAttack() > CurTime() then return end
+	
 	if self:Clip1() ~= 0 then
 		self:SetNextIdle( CurTime() + self:GetWeaponInfo().IdleInterval )
 		self:SendWeaponAnim( ACT_VM_IDLE )

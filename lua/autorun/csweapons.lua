@@ -152,9 +152,46 @@ game.AddAmmoType {
 			see ak47
 ]]
 
+local wepinfo_meta = {
+	MaxPlayerSpeed = 1,
+	WeaponPrice = -1,
+
+	WeaponArmorRatio = 1,
+	CrosshairMinDistance = 4,
+	CrosshairDeltaDistance = 3
+	CanEquipWithShield = false,
+	MuzzleFlashScale = 1,
+	MuzzleFlashStyle = "CS_MUZZLEFLASH_NORM",
+
+	Penetration = 1,
+	Damage = 42,
+	Range = 8192,
+	RangeModifier = 0.98,
+	Bullets = 1,
+	CycleTime = 0.15,
+	AccuracyQuadratic = 0,
+	AccuracyDivisor = -1,
+	AccuracyOffset = 0,
+	MaxInaccuracy = 0,
+
+	TimeToIdle = 2,
+	IdleInterval = 20,
+
+	TEAM = "ANY",
+
+	shieldviewmodel = "",
+	PlayerAnimationExtension = "m4",
+	BotAudibleRange = 2000,
+	WeaponType = 0
+}
+
+wepinfo_meta.__index = wepinfo_meta
+
 function CSParseWeaponInfo( self,  str )
 	
 	local wepinfotab = util.KeyValuesToTable( str, nil , true )
+
+	setmetatable( wepinfotab, wepinfo_meta )
 	
 	self._WeaponInfo = wepinfotab
 	self.PrintName = self._WeaponInfo.printname

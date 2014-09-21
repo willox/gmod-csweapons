@@ -36,6 +36,8 @@ function SWEP:Deploy()
 	self:SetDelayFire( false )
 	self:SetZoomFullyActiveTime( -1 )
 	self:SetAccuracy( 0.2 )
+	self:SetBurstFireEnabled( false )
+	self:SetBurstFires( 0 )
 	
 	return BaseClass.Deploy( self )
 end

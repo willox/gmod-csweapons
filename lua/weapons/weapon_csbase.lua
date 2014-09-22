@@ -54,6 +54,7 @@ function SWEP:SetupDataTables()
 	self:NetworkVar( "Int"	, 0 , "WeaponType" )
 	self:NetworkVar( "Int"	, 1 , "ShotsFired" )
 	self:NetworkVar( "Int"	, 2 , "Direction" )
+	self:NetworkVar( "Int"	, 3 , "WeaponID" )
 	
 	self:NetworkVar( "Bool"	, 0 , "InReload" )
 	self:NetworkVar( "Bool" , 1 , "HasSilencer" )

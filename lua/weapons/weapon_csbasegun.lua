@@ -16,20 +16,24 @@ end
 function SWEP:SetupDataTables()
 	BaseClass.SetupDataTables( self )
 	
-	self:NetworkVar( "Float" , 5 , "ZoomFullyActiveTime" )
-	
-	self:NetworkVar( "Float" , 6 , "ZoomLevel" )
-	
 	--Jvs: stuff that is scattered around all the weapons code that I'm going to try and unify here
+
+	self:NetworkVar( "Float" , 5 , "ZoomFullyActiveTime" )
+	self:NetworkVar( "Float" , 6 , "ZoomLevel" )
+	self:NetworkVar( "Float" , 7 , "NextBurstFire" ) 	--when the next burstfire is gonna happen, same as nextprimaryattack
+	self:NetworkVar( "Float" , 8 , "DoneSwitchingSilencer" )
+	self:NetworkVar( "Float" , 9 , "BurstFireDelay" )	--the speed of the burst fire itself, 0.5 means two shots every second etc
+	self:NetworkVar( "Float" , 10 , "LastFire" )
+	
 	
 	self:NetworkVar( "Bool" , 3 , "BurstFireEnabled" )
-	self:NetworkVar( "Float" , 7 , "NextBurstFire" ) 	--when the next burstfire is gonna happen, same as nextprimaryattack
-	self:NetworkVar( "Float" , 8 , "BurstFireDelay" )	--the speed of the burst fire itself, 0.5 means two shots every second etc
-	self:NetworkVar( "Int" , 3 , "BurstFires" )			--goes from X to 0, how many burst fires we're going to do
-	self:NetworkVar( "Int" , 4 , "MaxBurstFires" )
-	self:NetworkVar( "Float" , 8 , "DoneSwitchingSilencer" )
 	
-	self:NetworkVar( "Float" , 9 , "LastFire" )
+	self:NetworkVar( "Int" , 4 , "BurstFires" )			--goes from X to 0, how many burst fires we're going to do
+	self:NetworkVar( "Int" , 5 , "MaxBurstFires" )
+	
+	
+	
+	
 end
 
 function SWEP:Deploy()
@@ -74,7 +78,7 @@ function SWEP:Think()
 			else
 				self:SetNextPrimaryAttack( CurTime() - 1 )
 				self:PrimaryAttack()
-				self:SetNextPrimaryAttack( CurTime() + 0.5 )
+				self:SetNextPrimaryAttack( CurTime() + 0.5 )	--this artificial delay is inherited from the glock code
 				self:SetBurstFires( self:GetBurstFires() + 1 )
 			end
 		else
@@ -87,6 +91,7 @@ function SWEP:Think()
 end
 
 function SWEP:DoFireEffects()
+	--TODO: replace this with counter strike worldmodel muzzleflashes ( which are just the viewmodel muzzleflashes? )
 	self:GetOwner():MuzzleFlash()
 end
 
@@ -147,22 +152,9 @@ function SWEP:BaseGunFire( spread , cycletime , primarymode )
 	-- player "shoot" animation
 	pPlayer:DoAttackEvent()
 	
-	self:WeaponSound( "single_shot" )
 	
-	--Jvs: TODO
 	self:FireCSSBullet( pPlayer:GetAimVector():Angle() + 2 * pPlayer:GetViewPunchAngles() , primarymode , spread )
-	
-	--[[
-	FX_FireBullets(
-		pPlayer->entindex(),
-		pPlayer->Weapon_ShootPosition(),
-		pPlayer->EyeAngles() + 2.0f * pPlayer->GetPunchAngle(),
-		GetWeaponID(),
-		bPrimaryMode?Primary_Mode:Secondary_Mode,
-		CBaseEntity::GetPredictionRandomSeed() & 255,
-		flSpread )
-	]]
-	
+
 	self:DoFireEffects()
 
 	self:SetNextPrimaryAttack( CurTime() + cycletime )
@@ -174,6 +166,8 @@ function SWEP:BaseGunFire( spread , cycletime , primarymode )
 	else
 		self:SetNextBurstFire( -1 )
 	end
+	
+	self:SetLastFire( CurTime() )
 	return true
 end
 
@@ -193,25 +187,58 @@ end
 function SWEP:FireCSSBullet( ang , primarymode , spread )
 
 	local ply = self:GetOwner()
+	local pCSInfo = self:GetWeaponInfo()
+	local iDamage = pCSInfo.Damage
+	local flRangeModifier = pCSInfo.RangeModifier
+	local soundType = "single_shot"
+	
+	--[[ 
+		TODO: their horrible hacky balance
+		if self:GetWeaponID() == CS_WEAPON_GLOCK then
+			if not primarymode then
+				iDamage = 18	-- reduced power for burst shots
+				flRangeModifier = 0.9
+			end
+		elseif self:GetWeaponID() == CS_WEAPON_M4A1 then
+			if not primarymode then
+				flRangeModifier = 0.95 -- slower bullets in silenced mode
+				soundType = "special1"
+			end
+		elseif self:GetWeaponID() == CS_WEAPON_USP then
+			if not primarymode then
+				iDamage = 30 -- reduced damage in silenced mode
+				soundType = "special1"
+			end
+		end
+	]]
+	
+	self:WeaponSound( soundType )
+	
+	for iBullet = 1 , pCSInfo.Bullets do
+		local r = util.SharedRandom( "Spread" , 0, 2 * math.pi )
 
-	local r = util.SharedRandom( "Spread" , 0, 2 * math.pi )
+		local x = math.sin( r ) * util.SharedRandom( "SpreadX" , 0 , 0.5 )
+		local y = math.cos( r ) * util.SharedRandom( "SpreadY" , 0 , 1 )
 
-	local x = math.sin( r ) * util.SharedRandom( "SpreadX" , 0 , 0.5 )
-	local y = math.cos( r ) * util.SharedRandom( "SpreadY" , 0 , 1 )
+		local dir = ang:Forward() +
+			x * spread * ang:Right() +
+			y * spread * ang:Up()
 
-	local dir = ang:Forward() +
-		x * spread * ang:Right() +
-		y * spread * ang:Up()
-
-	dir:Normalize()
-
-	ply:FireBullets {
-		Attacker = ply,
-		Src = ply:GetShootPos(),
-		Dir = dir,
-		Spread = Vector(0, 0, 0)
-	}
-	self:SetLastFire( CurTime() )
+		dir:Normalize()
+		
+		
+		ply:FireBullets {
+			Attacker = ply,
+			Damage = iDamage,
+			Src = ply:GetShootPos(),
+			Dir = dir,
+			Spread = vector_origin,
+			Callback = function( hitent , trace , dmginfo )
+				--TODO: range damage modifiers and penetration
+				--unfortunately this can't be done with a static function or we'd need to set global variables for range and shit
+			end
+		}
+	end
 end
 
 if CLIENT then
@@ -229,11 +256,11 @@ if CLIENT then
 	SWEP.ScopeDustTexture = Material( "" )
 	
 	--[[
-		m_iScopeArcTexture = vgui::surface()->CreateNewTextureID();
-		vgui::surface()->DrawSetTextureFile(m_iScopeArcTexture, "sprites/scope_arc", true, false);
+		m_iScopeArcTexture = vgui::surface()->CreateNewTextureID()
+		vgui::surface()->DrawSetTextureFile(m_iScopeArcTexture, "sprites/scope_arc", true, false)
 
-		m_iScopeDustTexture = vgui::surface()->CreateNewTextureID();
-		vgui::surface()->DrawSetTextureFile(m_iScopeDustTexture, "overlays/scope_lens", true, false);
+		m_iScopeDustTexture = vgui::surface()->CreateNewTextureID()
+		vgui::surface()->DrawSetTextureFile(m_iScopeDustTexture, "overlays/scope_lens", true, false)
 	]]
 	
 	function SWEP:DoDrawCrosshair( x , y )

@@ -4,6 +4,8 @@ Counter-Strike: Source-esque weapons for Garry's Mod.
 
 This addon tries to faithfully recreate the counter strike source weapons we all love ( and hate ).
 
+If you need to submit a pull request, please don't use garry's style of coding ( using unnecessary brackets in ifs, adding ; everywhere, ! && || instead of not and or), it's incredibly annoying to read and we don't care if garry , acecool or robotboy want to endorse it.
+
 =====================================================
 
 Progress so far:

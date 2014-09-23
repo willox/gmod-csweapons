@@ -25,7 +25,6 @@ function SWEP:SetupDataTables()
 	self:NetworkVar( "Float" , 9 , "BurstFireDelay" )	--the speed of the burst fire itself, 0.5 means two shots every second etc
 	self:NetworkVar( "Float" , 10 , "LastFire" )
 	
-	
 	self:NetworkVar( "Bool" , 3 , "BurstFireEnabled" )
 	
 	self:NetworkVar( "Int" , 4 , "BurstFires" )			--goes from X to 0, how many burst fires we're going to do
@@ -107,11 +106,9 @@ function SWEP:Idle()
 end
 
 function SWEP:IsScoped()
-	--TODO: do something better than the shitty hacks valve does
+	--Jvs TODO: do something better than the shitty hacks valve does
 	return false
 end
-
---Jvs TODO: bullet firing code and animations
 
 function SWEP:BaseGunFire( spread , cycletime , primarymode )
 	
@@ -183,7 +180,6 @@ function SWEP:ToggleBurstFire()
 	self:SetBurstFireEnabled( not self:GetBurstFireEnabled() )
 end
 
---Jvs: there's LOTS of shit to do here, this'll have to wait until Willox finishes the weapon info parser
 function SWEP:FireCSSBullet( ang , primarymode , spread )
 
 	local ply = self:GetOwner()
@@ -252,8 +248,30 @@ if CLIENT then
 		end
 	end
 	
+	function SWEP:FireAnimationEvent( pos, ang, event, options )
+		
+		if event == 5001 or event == 5011 or event == 5021 or event == 5031 then
+		
+			local data = EffectData()
+			data:SetFlags( 0 )
+			data:SetEntity( self:GetOwner():GetViewModel() )
+			data:SetAttachment( math.floor( ( event - 4991 ) / 10 ) )
+			data:SetScale( self:GetWeaponInfo().MuzzleFlashScale )
+
+			if self.CSMuzzleX then
+				util.Effect( "CS_MuzzleFlash_X", data )
+			else
+				util.Effect( "CS_MuzzleFlash", data )
+			end
+		
+			return true
+		end
+
+	end
+	
 	SWEP.ScopeArcTexture = Material( "gmod/scope.vmt" )
 	SWEP.ScopeDustTexture = Material( "" )
+	
 	
 	--[[
 		m_iScopeArcTexture = vgui::surface()->CreateNewTextureID()

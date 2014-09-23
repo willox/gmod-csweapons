@@ -6,6 +6,8 @@ This addon tries to faithfully recreate the counter strike source weapons we all
 
 If you need to submit a pull request, please don't use garry's style of coding ( using unnecessary brackets in ifs, adding ; everywhere, ! && || instead of not and or), it's incredibly annoying to read and we don't care if garry , acecool or robotboy want to endorse it.
 
+Most of the code is a straight port from c++, so the naming convention for variables is not exactly consistent ( mostly Jvs' fault )
+
 =====================================================
 
 Progress so far:

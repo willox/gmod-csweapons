@@ -9,9 +9,13 @@ This addon tries to faithfully recreate the counter strike source weapons we all
 Progress so far:
 
 CSBase completed.
+
 CSBaseGun is missing zooming and shotgun related code.
+
 AK47 completed.
+
 M249 completed.
+
 Glock almost completed, only the burstfire needs to be the same as the original.
 
 =====================================================

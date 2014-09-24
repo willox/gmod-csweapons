@@ -14,7 +14,7 @@ Progress so far:
 
 CSBase completed.
 
-CSBaseGun is missing zooming and shotgun related code.
+CSBaseGun is missing damage fall-off, bullet penetration, zooming and shotgun related code.
 
 AK47 completed.
 

@@ -230,7 +230,7 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 			Dir = dir,
 			Spread = vector_origin,
 			Callback = function( hitent , trace , dmginfo )
-				--TODO: range damage modifiers and penetration
+				--TODO: range damage modifiers ( aka falloff ) and penetration
 				--unfortunately this can't be done with a static function or we'd need to set global variables for range and shit
 			end
 		}
@@ -247,6 +247,8 @@ if CLIENT then
 			return attch.Pos
 		end
 	end
+	
+	--copied straight from weapon_base
 	
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
 		
@@ -271,7 +273,7 @@ if CLIENT then
 	
 	SWEP.ScopeArcTexture = Material( "gmod/scope.vmt" )
 	SWEP.ScopeDustTexture = Material( "" )
-	
+	SWEP.ScopeFallback = true
 	
 	--[[
 		m_iScopeArcTexture = vgui::surface()->CreateNewTextureID()
@@ -287,6 +289,8 @@ if CLIENT then
 		end
 		return BaseClass.DoDrawCrosshair( self , x , y )
 	end
+	
+	--Jvs: should this technically be done in DoDrawCrosshair? DrawHUD is technically drawn in the gmod hud element
 	
 	function SWEP:DrawHUD()
 		if self:IsScoped() then
@@ -308,10 +312,22 @@ if CLIENT then
 			
 			surface.SetDrawColor( color_black )
 			surface.SetMaterial( self.ScopeArcTexture )
-			surface.DrawTexturedRect( x - ( ScrH() / 2	) , 0 , ScrH() , ScrH() )
+			
 			--Draw the reticle with primitives
 			surface.DrawLine( 0, y, screenWide, y )
 			surface.DrawLine( x, 0, x, screenTall )
+			
+			if self.ScopeFallback then
+				surface.DrawTexturedRect( x - ( ScrH() / 2	) , 0 , ScrH() , ScrH() )
+				--Jvs TODO: fill in the rest of the screen as well
+			end
+			
+			--[[
+				Jvs:can't use the code below until I find a good replacement for the scope, or I get Robotboy to add
+				the scope texture to gmod
+				Alternatively, I could make it so it uses the fallback above if CS:S isn't mounted, which sounds more reasonable
+			]]
+			
 			--[[
 			vgui::Vertex_t vert[4]	
 			

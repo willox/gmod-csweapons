@@ -190,7 +190,13 @@ wepinfo_meta.__index = wepinfo_meta
 function CSParseWeaponInfo( self,  str )
 	
 	local wepinfotab = util.KeyValuesToTable( str, nil , true )
-
+	
+	--Jvs: should never happen, but you never know with garry's baseclass stuff
+	
+	if not wepinfotab then
+		wepinfotab = {}
+	end
+	
 	setmetatable( wepinfotab, wepinfo_meta )
 	
 	self._WeaponInfo = wepinfotab
@@ -212,14 +218,19 @@ function CSParseWeaponInfo( self,  str )
 	self.Secondary.DefaultClip = 0
 	self.Secondary.Ammo = -1
 	
-	--self.ViewModelFlip = self._WeaponInfo.BuiltRightHanded == 0
-	self.ViewModelFOV = 45
+		
+	--TODO: if this viewmodel can't be converted into the corresponding c_ model, apply viewmodel flip as usual
 	
-	self.ViewModel = self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" ) 
+	--if file.Exists( self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" ) , "GAME" ) then
+		self.ViewModel = self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" ) 
+	--else
+		--self.ViewModelFlip = self._WeaponInfo.BuiltRightHanded == 0
+	--end
 	
 	self.WorldModel = self._WeaponInfo.playermodel
-	
+	self.ViewModelFOV = 45
 	self.Weight = self._WeaponInfo.weight
+	self.m_WeaponDeploySpeed = 1
 end
 
 hook.Add( "SetupMove" , "CSS - Speed Modify" , function( ply , mv , cmd )

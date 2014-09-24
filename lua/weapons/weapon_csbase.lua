@@ -424,9 +424,6 @@ if CLIENT then
 		local alpha = math.Clamp( cl_crosshairalpha:GetInt(), 0, 255 )
 		surface.SetDrawColor( r, g, b, alpha )
 		
-		draw.NoTexture()
-		--surface.DrawRect( 0 , 0 , 1000 , 1000 )
-		
 		--[[
 		
 		if ( not m_iCrosshairTextureID )
@@ -441,7 +438,7 @@ if CLIENT then
 
 		if not cl_crosshairusealpha:GetBool() then
 			surface.SetDrawColor( r, g, b, 200 )
-			--surface.SetTexture( m_iCrosshairTextureID )
+			draw.NoTexture()
 		end
 
 		local iHalfScreenWidth = 0
@@ -479,5 +476,10 @@ if CLIENT then
 		
 		return true
 	end
-
+	
+	--Jvs TODO: port the view bobbing code for the view model here
+	
+	function SWEP:CalcViewModelView( vm , oldpos , oldang , newpos , newang )
+	
+	end
 end

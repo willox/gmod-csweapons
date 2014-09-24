@@ -34,6 +34,7 @@ end
 function SWEP:Initialize()
 	self:SetHoldType( "normal" )
 	self:SetDelayFire( true )
+	self:SetFullReload( true )
 	
 	self:SetWeaponType( self.WeaponTypeToString[self:GetWeaponInfo().WeaponType] )
 end
@@ -73,6 +74,8 @@ function SWEP:SetupDataTables()
 	self:NetworkVar( "Bool"	, 0 , "InReload" )
 	self:NetworkVar( "Bool" , 1 , "HasSilencer" )
 	self:NetworkVar( "Bool"	, 2 , "DelayFire" )
+	
+	self:NetworkVar( "Bool" , 3 , "FullReload" )
 	
 end
 
@@ -183,6 +186,10 @@ function SWEP:Think()
 	]]
 	if self:InReload() and self:GetNextPrimaryAttack() <= CurTime() then
 		-- complete the reload. 
+		
+		--Jvs TODO: shotgun reloading here
+		
+		
 		local j = math.min( self:GetMaxClip1() - self:Clip1(), pPlayer:GetAmmoCount( self:GetPrimaryAmmoType() ) )
 		
 		-- Add them to the clip
@@ -516,8 +523,6 @@ if CLIENT then
 
 			angles.y = angles.y - self.LateralBob  * 0.3
 			return origin, angles
-		else
-			return newpos, newang
 		end
 	end
 	
@@ -533,7 +538,7 @@ if CLIENT then
 
 		--NOTENOTE: For now, let this cycle continue when in the air, because it snaps badly without it
 
-		if cl_bobcycle:GetFloat() <= 0 or cl_bobup:GetFloat() <= 0 or cl_bobup:GetFloat() >= 1 then
+		if FrameTime() == 0 or cl_bobcycle:GetFloat() <= 0 or cl_bobup:GetFloat() <= 0 or cl_bobup:GetFloat() >= 1 then
 			return
 		end
 
@@ -557,10 +562,9 @@ if CLIENT then
 		self.BobTime = self.BobTime + ( CurTime() - self.LastBobTime ) * bob_offset
 		self.LastBobTime = CurTime()
 
-		local bobtime = self.BobTime
 		
 		--Calculate the vertical bob
-		cycle = bobtime - ( bobtime / cl_bobcycle:GetFloat() ) * cl_bobcycle:GetFloat()
+		cycle = self.BobTime - ( self.BobTime / cl_bobcycle:GetFloat() ) * cl_bobcycle:GetFloat()
 		cycle = cycle / cl_bobcycle:GetFloat()
 
 		if cycle < cl_bobup:GetFloat() then
@@ -575,7 +579,7 @@ if CLIENT then
 		self.VerticalBob = math.Clamp( self.VerticalBob, -7.0, 4.0 )
 
 		--Calculate the lateral bob
-		cycle = bobtime - ( bobtime / cl_bobcycle:GetFloat() * 2 ) * cl_bobcycle:GetFloat() * 2
+		cycle = self.BobTime - ( self.BobTime / cl_bobcycle:GetFloat() * 2 ) * cl_bobcycle:GetFloat() * 2
 		cycle = cycle / ( cl_bobcycle:GetFloat() * 2 )
 
 		if cycle < cl_bobup:GetFloat() then

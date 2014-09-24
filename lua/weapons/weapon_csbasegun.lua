@@ -25,7 +25,7 @@ function SWEP:SetupDataTables()
 	self:NetworkVar( "Float" , 9 , "BurstFireDelay" )	--the speed of the burst fire itself, 0.5 means two shots every second etc
 	self:NetworkVar( "Float" , 10 , "LastFire" )
 	
-	self:NetworkVar( "Bool" , 3 , "BurstFireEnabled" )
+	self:NetworkVar( "Bool" , 4 , "BurstFireEnabled" )
 	
 	self:NetworkVar( "Int" , 4 , "BurstFires" )			--goes from X to 0, how many burst fires we're going to do
 	self:NetworkVar( "Int" , 5 , "MaxBurstFires" )

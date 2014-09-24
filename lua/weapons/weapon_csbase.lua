@@ -557,6 +557,8 @@ if CLIENT then
 		self.BobTime = self.BobTime + ( CurTime() - self.LastBobTime ) * bob_offset
 		self.LastBobTime = CurTime()
 
+		local bobtime = self.BobTime
+		
 		--Calculate the vertical bob
 		cycle = bobtime - ( bobtime / cl_bobcycle:GetFloat() ) * cl_bobcycle:GetFloat()
 		cycle = cycle / cl_bobcycle:GetFloat()

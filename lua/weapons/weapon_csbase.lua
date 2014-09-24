@@ -502,7 +502,7 @@ if CLIENT then
 		if self.CSSBobbing then
 			local forward = angles:Forward()
 
-			self:CalcViewmodelBob()
+			self:CalcViewModelBob()
 
 			// Apply bob, but scaled down to 40%
 			origin = origin + forward * self.VerticalBob * 0.4

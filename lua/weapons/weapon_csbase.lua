@@ -15,6 +15,20 @@ if CLIENT then
 	local cl_crosshairscale = CreateConVar( "cl_crosshairscale", "0", FCVAR_ARCHIVE )
 	local cl_crosshairalpha = CreateConVar( "cl_crosshairalpha", "200", FCVAR_ARCHIVE )
 	local cl_crosshairusealpha = CreateConVar( "cl_crosshairusealpha", "0", FCVAR_ARCHIVE )
+	
+	SWEP.CSSBobbing = true
+	
+	SWEP.LateralBob = 0
+	SWEP.VerticalBob = 0
+	
+	SWEP.BobTime = 0
+	SWEP.LastBobTime = 0
+	SWEP.LastSpeed = 0
+	
+	local cl_bobcycle = CreateConVar( "cl_bobcycle" , "0.8" , FCVAR_ARCHIVE )
+	local cl_bob = CreateConVar( "cl_bob" , "0.002" , FCVAR_ARCHIVE )
+	local cl_bobup = CreateConVar( "cl_bobup" , "0.5" , FCVAR_ARCHIVE )
+	
 end
 
 function SWEP:Initialize()
@@ -324,8 +338,20 @@ function SWEP:KickBack( up_base, lateral_base, up_modifier, lateral_modifier, up
 	self:GetOwner():SetViewPunchAngles( angle )
 end
 
+--[[
+	Jvs:	
+		this function is here to make the player faster or slower depending on the weapon equipped ( and mode of the weapon )
+		in CS:S the value here is actually a flat movement speed, but here we still want to replicate the movement speed of when you're zoomed in / use a knife
+		and forcing flat movement speeds in other gamemodes is dumb as hell
+]]
+
 function SWEP:GetSpeedRatio()
-	return 1
+	--Jvs: rare case where the speed might still be undefined
+	if self:GetWeaponInfo().MaxPlayerSpeed == 1 then
+		return 1
+	end
+	
+	return self:GetWeaponInfo().MaxPlayerSpeed / 250
 end
 
 if CLIENT then
@@ -335,6 +361,11 @@ if CLIENT then
 	local cl_crosshairscale = GetConVar( "cl_crosshairscale" )
 	local cl_crosshairalpha = GetConVar( "cl_crosshairalpha" )
 	local cl_crosshairusealpha = GetConVar( "cl_crosshairusealpha" )
+	
+	local cl_bobcycle = GetConVar( "cl_bobcycle" )
+	local cl_bob = GetConVar( "cl_bob" )
+	local cl_bobup = GetConVar( "cl_bobup" )
+	
 	
 	function SWEP:DoDrawCrosshair( x , y )
 		
@@ -423,18 +454,6 @@ if CLIENT then
 		
 		local alpha = math.Clamp( cl_crosshairalpha:GetInt(), 0, 255 )
 		surface.SetDrawColor( r, g, b, alpha )
-		
-		--[[
-		
-		if ( not m_iCrosshairTextureID )
-		{
-			CHudTexture *pTexture = gHUD.GetIcon( "whiteAdditive" )
-			if ( pTexture )
-			{
-				m_iCrosshairTextureID = pTexture->textureId
-			}
-		}
-		]]
 
 		if not cl_crosshairusealpha:GetBool() then
 			surface.SetDrawColor( r, g, b, 200 )
@@ -477,9 +496,95 @@ if CLIENT then
 		return true
 	end
 	
-	--Jvs TODO: port the view bobbing code for the view model here
+	--Jvs: CSS' viewmodel bobbing code, if it's disabled it'll just return hl2's
 	
-	function SWEP:CalcViewModelView( vm , oldpos , oldang , newpos , newang )
+	function SWEP:CalcViewModelView( vm , origin , angles , newpos , newang )
+		if self.CSSBobbing then
+			local forward = angles:Forward()
+
+			self:CalcViewmodelBob()
+
+			// Apply bob, but scaled down to 40%
+			origin = origin + forward * self.VerticalBob * 0.4
+			
+			// Z bob a bit more
+			origin.z = origin.z + self.VerticalBob * 0.1
+			
+			// bob the angles
+			angles.r = angles.r + self.VerticalBob * 0.5
+			angles.p = angles.p - self.VerticalBob * 0.4
+
+			angles.y = angles.y - self.LateralBob  * 0.3
+			return origin, angles
+		else
+			return newpos, newang
+		end
+	end
 	
+	
+	--Jvs TODO: replace CurTime() with RealTime() to prevent prediction errors from spazzing the viewmodel
+	
+	function SWEP:CalcViewModelBob()
+		
+		local cycle = 0
+		
+		local player = self:GetOwner()
+		--Assert( player )
+
+		--NOTENOTE: For now, let this cycle continue when in the air, because it snaps badly without it
+
+		if cl_bobcycle:GetFloat() <= 0 or cl_bobup:GetFloat() <= 0 or cl_bobup:GetFloat() >= 1 then
+			return
+		end
+
+		--Find the speed of the player
+		local speed = player:GetAbsVelocity():Length2D()
+		local flmaxSpeedDelta = math.max( 0, ( CurTime() - self.LastBobTime ) * player:GetMaxSpeed() )
+
+		-- don't allow too big speed changes
+		speed = math.Clamp( speed, self.LastSpeed - flmaxSpeedDelta, self.LastSpeed + flmaxSpeedDelta )
+		speed = math.Clamp( speed, player:GetMaxSpeed() * -1 , player:GetMaxSpeed() )
+
+		self.LastSpeed = speed
+
+		--FIXME: This maximum speed value must come from the server.
+		--		 MaxSpeed() is not sufficient for dealing with sprinting - jdw
+
+		
+
+		local bob_offset = math.Remap( speed, 0, player:GetMaxSpeed(), 0 , 1 )
+		
+		self.BobTime = self.BobTime + ( CurTime() - self.LastBobTime ) * bob_offset
+		self.LastBobTime = CurTime()
+
+		--Calculate the vertical bob
+		cycle = bobtime - ( bobtime / cl_bobcycle:GetFloat() ) * cl_bobcycle:GetFloat()
+		cycle = cycle / cl_bobcycle:GetFloat()
+
+		if cycle < cl_bobup:GetFloat() then
+			cycle = math.pi * cycle / cl_bobup:GetFloat()
+		else
+			cycle = math.pi + math.pi * ( cycle - cl_bobup:GetFloat() ) / ( 1 - cl_bobup:GetFloat() )
+		end
+		
+		self.VerticalBob = speed * 0.005
+		self.VerticalBob = self.VerticalBob * 0.3 + self.VerticalBob * 0.7 * math.sin( cycle )
+
+		self.VerticalBob = math.Clamp( self.VerticalBob, -7.0, 4.0 )
+
+		--Calculate the lateral bob
+		cycle = bobtime - ( bobtime / cl_bobcycle:GetFloat() * 2 ) * cl_bobcycle:GetFloat() * 2
+		cycle = cycle / ( cl_bobcycle:GetFloat() * 2 )
+
+		if cycle < cl_bobup:GetFloat() then
+			cycle = math.pi * cycle / cl_bobup:GetFloat()
+		else
+			cycle = math.pi + math.pi * ( cycle - cl_bobup:GetFloat() ) / ( 1 - cl_bobup:GetFloat() )
+		end
+
+		self.LateralBob = speed * 0.005
+		self.LateralBob = self.LateralBob * 0.3 + self.LateralBob * 0.7 * math.sin( cycle )
+		self.LateralBob = math.Clamp( self.LateralBob , -7 , 4 )
+		return
 	end
 end

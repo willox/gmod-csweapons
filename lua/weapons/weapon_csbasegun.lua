@@ -239,6 +239,12 @@ end
 
 if CLIENT then
 	
+	function SWEP:PreDrawViewModel( vm , weapon , ply )
+		if self:IsScoped() then
+			return true
+		end
+	end
+	
 	function SWEP:GetTracerOrigin()
 		if IsValid( self:GetOwner() ) then
 			local viewmodel = self:GetOwner():GetViewModel( 0 )

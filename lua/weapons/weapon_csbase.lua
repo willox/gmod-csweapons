@@ -361,6 +361,7 @@ if CLIENT then
 	local cl_bob = GetConVar( "cl_bob" )
 	local cl_bobup = GetConVar( "cl_bobup" )
 	
+	SWEP.LastAmmoCheck = 0
 	
 	function SWEP:DoDrawCrosshair( x , y )
 		
@@ -380,12 +381,13 @@ if CLIENT then
 	
 		
 		
-		if self.CrosshairDistance <= iDistance then
-			self.CrosshairDistance = self.CrosshairDistance - 0.1 + self.CrosshairDistance * 0.013
-		else
+		if self:GetShotsFired() > self.LastAmmoCheck then
 			self.CrosshairDistance = math.min( 15, self.CrosshairDistance + iDeltaDistance )
+		elseif self.CrosshairDistance > iDistance then
+			self.CrosshairDistance = 0.1 + self.CrosshairDistance * 0.013
 		end
 		
+		self.LastAmmoCheck = self:GetShotsFired()
 		
 		if self.CrosshairDistance < iDistance then
 			 self.CrosshairDistance = iDistance
@@ -532,11 +534,11 @@ if CLIENT then
 
 		--Find the speed of the player
 		local speed = player:GetAbsVelocity():Length2D()
-		local flmaxSpeedDelta = math.max( 0, ( CurTime() - self.LastBobTime ) * player:GetMaxSpeed() )
+		local flmaxSpeedDelta = math.max( 0, ( CurTime() - self.LastBobTime ) * player:GetRunSpeed() )
 
 		-- don't allow too big speed changes
 		speed = math.Clamp( speed, self.LastSpeed - flmaxSpeedDelta, self.LastSpeed + flmaxSpeedDelta )
-		speed = math.Clamp( speed, player:GetMaxSpeed() * -1 , player:GetMaxSpeed() )
+		speed = math.Clamp( speed, player:GetRunSpeed() * -1 , player:GetRunSpeed() )
 
 		self.LastSpeed = speed
 
@@ -545,7 +547,7 @@ if CLIENT then
 
 		
 
-		local bob_offset = math.Remap( speed, 0, player:GetMaxSpeed(), 0 , 1 )
+		local bob_offset = math.Remap( speed, 0, player:GetRunSpeed(), 0 , 1 )
 		
 		self.BobTime = self.BobTime + ( CurTime() - self.LastBobTime ) * bob_offset
 		self.LastBobTime = CurTime()

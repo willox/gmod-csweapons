@@ -2,7 +2,7 @@
 
 Counter-Strike: Source-esque weapons for Garry's Mod.
 
-This addon tries to faithfully recreate the counter strike source weapons we all love ( and hate ).
+This addon tries to faithfully recreate the counter strike source weapons we all love ( and hate ) , while still providing a weapon base that can be used for custom counter strike weapons.
 
 The code we use to replicate these weapons is really outdated, so it doesn't contain the latest balance changes and recoils/spread patterns.
 

@@ -168,11 +168,11 @@ function SWEP:PrimaryAttack()
 	end
 end
 
-function SWEP:GetFireActivity()
-	if self:GetBurstFireEnabled() then
+function SWEP:TranslateViewModelActivity( act )
+	if self:GetBurstFireEnabled() and act == ACT_VM_PRIMARYATTACK then
 		return ACT_VM_SECONDARYATTACK
 	else
-		return BaseClass.GetFireActivity( self )
+		return BaseClass.TranslateViewModelActivity( self , act )
 	end
 end
 

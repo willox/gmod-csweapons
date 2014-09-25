@@ -84,7 +84,7 @@ function SWEP:Deploy()
 	self:SetShotsFired( 0 )
 	self:SetInReload( false )
 	
-	self:SendWeaponAnim( self:GetDeployActivity() )
+	self:SendWeaponAnim( self:TranslateViewModelActivity( ACT_VM_DRAW ) )
 	self:SetNextPrimaryAttack( CurTime() + self:SequenceDuration() )
 	self:SetNextSecondaryAttack( CurTime() + self:SequenceDuration() )
 	
@@ -99,7 +99,7 @@ function SWEP:Reload()
 	if self:GetMaxClip1() ~= -1 and not self:InReload() and self:GetNextPrimaryAttack() < CurTime() then
 		self:SetShotsFired( 0 )
 		
-		local reload = self:MainReload( ACT_VM_RELOAD )
+		local reload = self:MainReload( self:TranslateViewModelActivity( ACT_VM_RELOAD ) )
 		
 	end
 end
@@ -232,7 +232,7 @@ end
 
 function SWEP:Idle()
 	if CurTime() > self:GetNextIdle() then
-		self:SendWeaponAnim( ACT_VM_IDLE )
+		self:SendWeaponAnim( self:TranslateViewModelActivity( ACT_VM_IDLE ) )
 	end
 end
 
@@ -253,16 +253,8 @@ function SWEP:IsSilenced()
 	return self:GetHasSilencer()
 end
 
-function SWEP:GetDeployActivity()
-	if self:IsSilenced() then
-		return ACT_VM_DRAW_SILENCED
-	else
-		return ACT_VM_DRAW
-	end
-end
-
-function SWEP:GetFireActivity()
-	return ACT_VM_PRIMARYATTACK
+function SWEP:TranslateViewModelActivity( act )
+	return act
 end
 
 --TODO: use getweaponinfo and shit to emit the sound here

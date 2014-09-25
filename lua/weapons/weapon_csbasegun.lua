@@ -46,7 +46,7 @@ function SWEP:Deploy()
 end
 
 function SWEP:Think()
-	
+	self:UpdateWorldModel()
 	
 	--Jvs: TODO, I don't know what this code actually does, but it seems important for their AWP crap to prevent accuracy exploits or some other shit
 	
@@ -129,8 +129,12 @@ function SWEP:Idle()
 	
 	if self:Clip1() ~= 0 then
 		self:SetNextIdle( CurTime() + self:GetWeaponInfo().IdleInterval )
-		self:SendWeaponAnim( ACT_VM_IDLE )
+		self:SendWeaponAnim( self:TranslateViewModelActivity( ACT_VM_IDLE ) )
 	end
+end
+
+function SWEP:TranslateViewModelActivity( act )
+	return BaseClass.TranslateViewModelActivity( self , act )
 end
 
 function SWEP:IsScoped()
@@ -170,7 +174,7 @@ function SWEP:BaseGunFire( spread , cycletime , primarymode )
 		return false
 	end
 
-	self:SendWeaponAnim( self:GetFireActivity() )
+	self:SendWeaponAnim( self:TranslateViewModelActivity( ACT_VM_PRIMARYATTACK ) )
 
 	self:SetClip1( self:Clip1() -1 )
 
@@ -265,7 +269,15 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 	end
 end
 
+function SWEP:UpdateWorldModel()
+end
+
 if CLIENT then
+	
+	function SWEP:DrawWorldModel()
+		self:UpdateWorldModel()
+		self:DrawModel()
+	end
 	
 	function SWEP:PreDrawViewModel( vm , weapon , ply )
 		if self:IsScoped() then

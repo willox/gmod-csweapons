@@ -258,6 +258,7 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 		
 		
 		ply:FireBullets {
+			Tracer = 2,
 			Attacker = ply,
 			Damage = iDamage,
 			Src = ply:GetShootPos(),

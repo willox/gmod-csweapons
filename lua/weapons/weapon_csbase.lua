@@ -16,7 +16,7 @@ if CLIENT then
 	local cl_crosshairalpha = CreateConVar( "cl_crosshairalpha", "200", FCVAR_ARCHIVE )
 	local cl_crosshairusealpha = CreateConVar( "cl_crosshairusealpha", "0", FCVAR_ARCHIVE )
 	
-	SWEP.CSSBobbing = true
+	SWEP.CSSBobbing = false
 	
 	SWEP.LateralBob = 0
 	SWEP.VerticalBob = 0
@@ -261,9 +261,14 @@ end
 function SWEP:WeaponSound( soundtype )
 	if not self:GetWeaponInfo() then return end
 	
+	if self:IsSilenced() and soundtype == "single_shot" then
+		soundtype = "special1"
+	end
+	
 	local sndname = self:GetWeaponInfo().SoundData[soundtype]
 	
 	if sndname then
+		
 		self:EmitSound( sndname , nil , nil , nil , CHAN_AUTO )
 	end
 end
@@ -501,13 +506,13 @@ if CLIENT then
 
 			self:CalcViewModelBob()
 
-			// Apply bob, but scaled down to 40%
+			-- Apply bob, but scaled down to 40%
 			origin = origin + forward * self.VerticalBob * 0.4
 			
-			// Z bob a bit more
+			-- Z bob a bit more
 			origin.z = origin.z + self.VerticalBob * 0.1
 			
-			// bob the angles
+			-- bob the angles
 			angles.r = angles.r + self.VerticalBob * 0.5
 			angles.p = angles.p - self.VerticalBob * 0.4
 

@@ -133,6 +133,7 @@ SWEP.SilencedTranslation = {
 	[ACT_VM_RELOAD] = ACT_VM_RELOAD_SILENCED,
 	[ACT_VM_PRIMARYATTACK] = ACT_VM_PRIMARYATTACK_SILENCED,
 	[ACT_VM_DRAW] = ACT_VM_DRAW_SILENCED,
+	[ACT_VM_IDLE] = ACT_VM_IDLE_SILENCED,
 }
 
 function SWEP:Initialize()
@@ -213,9 +214,11 @@ function SWEP:GunFire( spread , mode )
 		self:SetAccuracy( 0.6 )
 	end
 	
-	self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, mode )
-	
 	self:SetNextIdle( CurTime() + 2 )
+	
+	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, mode ) then return end
+	
+	
 
 	local angle = self:GetOwner():GetViewPunchAngles()
 	angle.p = angle.p - 2
@@ -230,6 +233,8 @@ function SWEP:SecondaryAttack()
 	else
 		self:SendWeaponAnim( ACT_VM_ATTACH_SILENCER )
 	end
+	
+	self:GetOwner():DoReloadEvent()
 	
 	self:SetHasSilencer( not self:GetHasSilencer() )
 	self:SetDoneSwitchingSilencer( CurTime() + 3 )

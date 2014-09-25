@@ -45,6 +45,10 @@ function SWEP:Deploy()
 	return BaseClass.Deploy( self )
 end
 
+function SWEP:Holster()
+	return BaseClass.Holster( self )
+end
+
 function SWEP:Think()
 	self:UpdateWorldModel()
 	
@@ -91,13 +95,12 @@ end
 
 function SWEP:DoFireEffects()
 	if not self:IsSilenced() then
-		self:GetOwner():MuzzleFlash()
+		--self:GetOwner():MuzzleFlash()
 		
 		--Jvs: on the client, we don't want to show this muzzle flash on the owner of this weapon if he's in first person
 		
 		--TODO: spectator support? who even gives a damn but ok
 		
-		--[[
 		if CLIENT then
 			if self:IsCarriedByLocalPlayer() and not self:GetOwner():ShouldDrawLocalPlayer() then
 				return
@@ -117,8 +120,7 @@ function SWEP:DoFireEffects()
 		else
 			util.Effect( "CS_MuzzleFlash", data )
 		end
-		
-		]]
+
 	end
 end
 
@@ -299,7 +301,10 @@ if CLIENT then
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
 		
 		if event == 5001 or event == 5011 or event == 5021 or event == 5031 then
-		
+			if self:IsSilenced() then
+				return true
+			end
+			
 			local data = EffectData()
 			data:SetFlags( 0 )
 			data:SetEntity( self:GetOwner():GetViewModel() )

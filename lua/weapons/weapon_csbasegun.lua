@@ -90,8 +90,36 @@ function SWEP:Think()
 end
 
 function SWEP:DoFireEffects()
-	--TODO: replace this with counter strike worldmodel muzzleflashes ( which are just the viewmodel muzzleflashes? )
-	self:GetOwner():MuzzleFlash()
+	if not self:IsSilenced() then
+		self:GetOwner():MuzzleFlash()
+		
+		--Jvs: on the client, we don't want to show this muzzle flash on the owner of this weapon if he's in first person
+		
+		--TODO: spectator support? who even gives a damn but ok
+		
+		--[[
+		if CLIENT then
+			if self:IsCarriedByLocalPlayer() and not self:GetOwner():ShouldDrawLocalPlayer() then
+				return
+			end
+		end
+		
+		--Jvs NOTE: prediction should already prevent this from sending the effect to the owner's client side
+		
+		local data = EffectData()
+		data:SetFlags( 0 )
+		data:SetEntity( self )
+		data:SetAttachment( 1 )	--TODO: self:LookupAttachment( "muzzle" ) or whatever it's called
+		data:SetScale( self:GetWeaponInfo().MuzzleFlashScale )
+		
+		if self.CSMuzzleX then
+			util.Effect( "CS_MuzzleFlash_X", data )
+		else
+			util.Effect( "CS_MuzzleFlash", data )
+		end
+		
+		]]
+	end
 end
 
 function SWEP:Idle()

@@ -249,10 +249,6 @@ function SWEP:IsPistol()
 	return self:GetWeaponType() == CS_WEAPONTYPE_PISTOL
 end
 
-function SWEP:IsAwp()
-	return false
-end
-
 function SWEP:IsSilenced()
 	return self:GetHasSilencer()
 end

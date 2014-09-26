@@ -49,9 +49,9 @@ function SWEP:Holster()
 	return BaseClass.Holster( self )
 end
 
-function SWEP:Think()
-	self:UpdateWorldModel()
-	
+--Jvs : this function handles the zoom smoothing and decay
+
+function SWEP:HandleZoom()
 	--Jvs: TODO, I don't know what this code actually does, but it seems important for their AWP crap to prevent accuracy exploits or some other shit
 	
 --[[
@@ -71,6 +71,14 @@ function SWEP:Think()
 #endif
 	}
 ]]
+end
+
+function SWEP:Think()
+
+	self:UpdateWorldModel()
+	
+	self:HandleZoom()
+
 	BaseClass.Think( self )
 	
 	
@@ -95,8 +103,6 @@ end
 
 function SWEP:DoFireEffects()
 	if not self:IsSilenced() then
-		--self:GetOwner():MuzzleFlash()
-		
 		--Jvs: on the client, we don't want to show this muzzle flash on the owner of this weapon if he's in first person
 		
 		--TODO: spectator support? who even gives a damn but ok

@@ -143,7 +143,7 @@ end
 
 function SWEP:Deploy()
 	
-	self:SetAccuracy( 0.9 )
+	self:SetAccuracy( 0.92 )
 	self:SetDoneSwitchingSilencer( 0 )
 	return BaseClass.Deploy( self )
 end

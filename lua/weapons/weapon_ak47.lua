@@ -125,6 +125,7 @@ SWEP.Spawnable = true
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
 	self:SetHoldType( "ar2" )
+	self:SetWeaponID( CS_WEAPON_AK47 )
 end
 
 function SWEP:PrimaryAttack()

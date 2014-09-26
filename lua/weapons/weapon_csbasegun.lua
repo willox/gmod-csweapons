@@ -222,25 +222,24 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 	local flRangeModifier = pCSInfo.RangeModifier
 	local soundType = "single_shot"
 	
-	--[[ 
-		TODO: their horrible hacky balance
-		if self:GetWeaponID() == CS_WEAPON_GLOCK then
-			if not primarymode then
-				iDamage = 18	-- reduced power for burst shots
-				flRangeModifier = 0.9
-			end
-		elseif self:GetWeaponID() == CS_WEAPON_M4A1 then
-			if not primarymode then
-				flRangeModifier = 0.95 -- slower bullets in silenced mode
-				soundType = "special1"
-			end
-		elseif self:GetWeaponID() == CS_WEAPON_USP then
-			if not primarymode then
-				iDamage = 30 -- reduced damage in silenced mode
-				soundType = "special1"
-			end
+	--Valve's horrible hacky balance
+	
+	if self:GetWeaponID() == CS_WEAPON_GLOCK then
+		if not primarymode then
+			iDamage = 18	-- reduced power for burst shots
+			flRangeModifier = 0.9
 		end
-	]]
+	elseif self:GetWeaponID() == CS_WEAPON_M4A1 then
+		if not primarymode then
+			flRangeModifier = 0.95 -- slower bullets in silenced mode
+			soundType = "special1"
+		end
+	elseif self:GetWeaponID() == CS_WEAPON_USP then
+		if not primarymode then
+			iDamage = 30 -- reduced damage in silenced mode
+			soundType = "special1"
+		end
+	end
 	
 	self:WeaponSound( soundType )
 	
@@ -258,6 +257,7 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 		
 		
 		ply:FireBullets {
+			Distance = pCSInfo.Range,
 			Tracer = 2,
 			Attacker = ply,
 			Damage = iDamage,

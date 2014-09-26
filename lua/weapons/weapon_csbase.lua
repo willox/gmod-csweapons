@@ -257,13 +257,8 @@ function SWEP:TranslateViewModelActivity( act )
 	return act
 end
 
---TODO: use getweaponinfo and shit to emit the sound here
 function SWEP:WeaponSound( soundtype )
 	if not self:GetWeaponInfo() then return end
-	
-	if self:IsSilenced() and soundtype == "single_shot" then
-		soundtype = "special1"
-	end
 	
 	local sndname = self:GetWeaponInfo().SoundData[soundtype]
 	

@@ -131,6 +131,7 @@ function SWEP:Initialize()
 	self:SetBurstFireEnabled( false )
 	self:SetMaxBurstFires( 3 )
 	self:SetBurstFireDelay( 0.1 )
+	self:SetWeaponID( CS_WEAPON_GLOCK )
 end
 
 function SWEP:Deploy()

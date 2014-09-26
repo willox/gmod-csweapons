@@ -155,16 +155,16 @@ function SWEP:PrimaryAttack()
 			self:GunFire( 0.3 * ( 1- self:GetAccuracy()), true )
 		end
 		]]
-		self:GunFire( 0.05 , true )	--thanks valve!
+		self:GunFire( 0.05 , false )	--thanks valve!
 	else
 		if not self:GetOwner():OnGround() then
-			self:GunFire( 1.0 * ( 1- self:GetAccuracy()), false )
+			self:GunFire( 1.0 * ( 1- self:GetAccuracy()), true )
 		elseif self:GetOwner():GetAbsVelocity():Length2D() > 5 then
-			self:GunFire( 0.165 * ( 1- self:GetAccuracy()), false )
+			self:GunFire( 0.165 * ( 1- self:GetAccuracy()), true )
 		elseif self:GetOwner():Crouching() then
-			self:GunFire( 0.075 * ( 1- self:GetAccuracy()), false )
+			self:GunFire( 0.075 * ( 1- self:GetAccuracy()), true )
 		else
-			self:GunFire( 0.1 * ( 1- self:GetAccuracy()), false )
+			self:GunFire( 0.1 * ( 1- self:GetAccuracy()), true )
 		end
 	end
 end

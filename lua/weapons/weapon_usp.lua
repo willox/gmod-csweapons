@@ -165,24 +165,24 @@ function SWEP:PrimaryAttack()
 	
 	if self:IsSilenced() then
 		if not self:GetOwner():OnGround() then
-			self:GunFire( 1.3 * ( 1- self:GetAccuracy()), true )
+			self:GunFire( 1.3 * ( 1- self:GetAccuracy()), false )
 		elseif self:GetOwner():GetAbsVelocity():Length2D() > 5 then
-			self:GunFire( 0.25 * ( 1- self:GetAccuracy()), true )
+			self:GunFire( 0.25 * ( 1- self:GetAccuracy()), false )
 		elseif self:GetOwner():Crouching() then
-			self:GunFire( 0.125 * ( 1- self:GetAccuracy()), true )
+			self:GunFire( 0.125 * ( 1- self:GetAccuracy()), false )
 		else
-			self:GunFire( 0.15 * ( 1- self:GetAccuracy()), true )
+			self:GunFire( 0.15 * ( 1- self:GetAccuracy()), false )
 		end
 		
 	else
 		if not self:GetOwner():OnGround() then
-			self:GunFire( 1.2 * ( 1- self:GetAccuracy()), false )
+			self:GunFire( 1.2 * ( 1- self:GetAccuracy()), true )
 		elseif self:GetOwner():GetAbsVelocity():Length2D() > 5 then
-			self:GunFire( 0.225 * ( 1- self:GetAccuracy()), false )
+			self:GunFire( 0.225 * ( 1- self:GetAccuracy()), true )
 		elseif self:GetOwner():Crouching() then
-			self:GunFire( 0.08 * ( 1- self:GetAccuracy()), false )
+			self:GunFire( 0.08 * ( 1- self:GetAccuracy()), true )
 		else
-			self:GunFire( 0.1 * ( 1- self:GetAccuracy()), false )
+			self:GunFire( 0.1 * ( 1- self:GetAccuracy()), true )
 		end
 	end
 end

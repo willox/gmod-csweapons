@@ -217,6 +217,19 @@ local wepinfo_meta = {
 
 wepinfo_meta.__index = wepinfo_meta
 
+if CLIENT then
+	CS_KILLICON_FONT = "CSTypeDeath"
+	
+	surface.CreateFont( CS_KILLICON_FONT ,
+	{
+		font		= "csd",
+		size		= ScreenScale( 15 ),
+		antialias	= true,
+		weight		= 300
+	})
+	
+end
+
 function CSParseWeaponInfo( self,  str )
 	local class = self.Folder:Replace( ".lua" , "" )
 	class = class:Replace( "weapons/" , "" )
@@ -264,9 +277,10 @@ function CSParseWeaponInfo( self,  str )
 	self.ViewModelFOV = 45
 	self.Weight = self._WeaponInfo.weight
 	self.m_WeaponDeploySpeed = 1
-	
-	if self._WeaponInfo.TextureData then
-		killicon.AddFont( class , "csd" , self._WeaponInfo.TextureData.weapon.character:lower() , Color( 255, 80, 0, 255 ) )
+	if CLIENT then
+		if self._WeaponInfo.TextureData then
+			killicon.AddFont( class , CS_KILLICON_FONT , self._WeaponInfo.TextureData.weapon.character:lower() , Color( 255, 80, 0, 255 ) )
+		end
 	end
 end
 

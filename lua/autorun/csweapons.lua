@@ -223,7 +223,7 @@ if CLIENT then
 	surface.CreateFont( CS_KILLICON_FONT ,
 	{
 		font		= "csd",
-		size		= ScreenScale( 15 ),
+		size		= ScreenScale( 20 ),
 		antialias	= true,
 		weight		= 300
 	})
@@ -267,11 +267,12 @@ function CSParseWeaponInfo( self,  str )
 	
 	local convertedvm = self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" )
 	
-	--if file.Exists( convertedvm , "GAME" ) then
+	if file.Exists( convertedvm , "GAME" ) then
+		print( file.Exists( convertedvm , "GAME" ) )
 		self.ViewModel = convertedvm
-	--else
-		--self.ViewModelFlip = self._WeaponInfo.BuiltRightHanded == 0
-	--end
+	else
+		self.ViewModelFlip = self._WeaponInfo.BuiltRightHanded == 0
+	end
 	
 	self.WorldModel = self._WeaponInfo.playermodel
 	self.ViewModelFOV = 45

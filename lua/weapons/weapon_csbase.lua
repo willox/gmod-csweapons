@@ -99,8 +99,7 @@ function SWEP:Reload()
 	if self:GetMaxClip1() ~= -1 and not self:InReload() and self:GetNextPrimaryAttack() < CurTime() then
 		self:SetShotsFired( 0 )
 		
-		local reload = self:MainReload( self:TranslateViewModelActivity( ACT_VM_RELOAD ) )
-		
+		return self:MainReload( self:TranslateViewModelActivity( ACT_VM_RELOAD ) )
 	end
 end
 

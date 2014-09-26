@@ -150,9 +150,12 @@ function SWEP:Deploy()
 end
 
 function SWEP:Holster()
+	
 	if self:GetDoneSwitchingSilencer() > 0 and self:GetDoneSwitchingSilencer() > CurTime() then
 		self:SetHasSilencer( false )
 	end
+	
+	self:UpdateWorldModel()
 	
 	return BaseClass.Holster( self )
 end

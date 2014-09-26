@@ -218,7 +218,8 @@ local wepinfo_meta = {
 wepinfo_meta.__index = wepinfo_meta
 
 function CSParseWeaponInfo( self,  str )
-	
+	local class = self.Folder:Replace( ".lua" , "" )
+	class = class:Replace( "weapons/" , "" )
 	local wepinfotab = util.KeyValuesToTable( str, nil , true )
 	
 	--Jvs: should never happen, but you never know with garry's baseclass stuff
@@ -251,8 +252,10 @@ function CSParseWeaponInfo( self,  str )
 		
 	--TODO: if this viewmodel can't be converted into the corresponding c_ model, apply viewmodel flip as usual
 	
-	--if file.Exists( self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" ) , "GAME" ) then
-		self.ViewModel = self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" ) 
+	local convertedvm = self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" )
+	
+	--if file.Exists( convertedvm , "GAME" ) then
+		self.ViewModel = convertedvm
 	--else
 		--self.ViewModelFlip = self._WeaponInfo.BuiltRightHanded == 0
 	--end
@@ -261,6 +264,10 @@ function CSParseWeaponInfo( self,  str )
 	self.ViewModelFOV = 45
 	self.Weight = self._WeaponInfo.weight
 	self.m_WeaponDeploySpeed = 1
+	
+	if self._WeaponInfo.TextureData then
+		killicon.AddFont( class , "csd" , self._WeaponInfo.TextureData.weapon.character:lower() , Color( 255, 80, 0, 255 ) )
+	end
 end
 
 hook.Add( "SetupMove" , "CSS - Speed Modify" , function( ply , mv , cmd )

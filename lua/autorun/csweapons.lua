@@ -263,8 +263,7 @@ function CSParseWeaponInfo( self,  str )
 	self.Secondary.Ammo = -1
 	
 		
-	--TODO: if this viewmodel can't be converted into the corresponding c_ model, apply viewmodel flip as usual
-	
+	--Jvs: if this viewmodel can't be converted into the corresponding c_ model, apply viewmodel flip as usual
 	local convertedvm = self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" )
 	
 	if file.Exists( convertedvm , "GAME" ) then

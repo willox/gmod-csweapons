@@ -252,8 +252,8 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 	for iBullet = 1 , pCSInfo.Bullets do
 		local r = util.SharedRandom( "Spread" , 0, 2 * math.pi )
 
-		local x = math.sin( r ) * util.SharedRandom( "SpreadX" , 0 , 0.5 )
-		local y = math.cos( r ) * util.SharedRandom( "SpreadY" , 0 , 1 )
+		local x = math.sin( r ) * util.SharedRandom( "SpreadX"..iBullet , 0 , 0.5 )
+		local y = math.cos( r ) * util.SharedRandom( "SpreadY"..iBullet , 0 , 1 )
 
 		local dir = ang:Forward() +
 			x * spread * ang:Right() +
@@ -263,6 +263,7 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 		
 		
 		ply:FireBullets {
+			AmmoType = self.Primary.Ammo,
 			Distance = pCSInfo.Range,
 			Tracer = 2,
 			Attacker = ply,

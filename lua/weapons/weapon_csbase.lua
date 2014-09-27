@@ -9,12 +9,12 @@ SWEP.CSSWeapon = true
 
 if CLIENT then
 	SWEP.CrosshairDistance = 0
-	local cl_crosshaircolor = CreateConVar( "cl_crosshaircolor", "0", FCVAR_ARCHIVE )
-	local cl_dynamiccrosshair = CreateConVar( "cl_dynamiccrosshair", "1", FCVAR_ARCHIVE )
-	local cl_scalecrosshair = CreateConVar( "cl_scalecrosshair", "1", FCVAR_ARCHIVE )
-	local cl_crosshairscale = CreateConVar( "cl_crosshairscale", "0", FCVAR_ARCHIVE )
-	local cl_crosshairalpha = CreateConVar( "cl_crosshairalpha", "200", FCVAR_ARCHIVE )
-	local cl_crosshairusealpha = CreateConVar( "cl_crosshairusealpha", "0", FCVAR_ARCHIVE )
+	local cl_crosshaircolor = CreateConVar( "cl_cs_crosshaircolor", "0", FCVAR_ARCHIVE )
+	local cl_dynamiccrosshair = CreateConVar( "cl_cs_dynamiccrosshair", "1", FCVAR_ARCHIVE )
+	local cl_scalecrosshair = CreateConVar( "cl_cs_scalecrosshair", "1", FCVAR_ARCHIVE )
+	local cl_crosshairscale = CreateConVar( "cl_cs_crosshairscale", "0", FCVAR_ARCHIVE )
+	local cl_crosshairalpha = CreateConVar( "cl_cs_crosshairalpha", "200", FCVAR_ARCHIVE )
+	local cl_crosshairusealpha = CreateConVar( "cl_cs_crosshairusealpha", "0", FCVAR_ARCHIVE )
 	
 	SWEP.CSSBobbing = false
 	
@@ -25,9 +25,9 @@ if CLIENT then
 	SWEP.LastBobTime = 0
 	SWEP.LastSpeed = 0
 	
-	local cl_bobcycle = CreateConVar( "cl_bobcycle" , "0.8" , FCVAR_ARCHIVE )
-	local cl_bob = CreateConVar( "cl_bob" , "0.002" , FCVAR_ARCHIVE )
-	local cl_bobup = CreateConVar( "cl_bobup" , "0.5" , FCVAR_ARCHIVE )
+	local cl_bobcycle = CreateConVar( "cl_cs_bobcycle" , "0.8" , FCVAR_ARCHIVE + FCVAR_CHEAT )
+	local cl_bob = CreateConVar( "cl_cs_bob" , "0.002" , FCVAR_ARCHIVE + FCVAR_CHEAT )
+	local cl_bobup = CreateConVar( "cl_cs_bobup" , "0.5" , FCVAR_ARCHIVE + FCVAR_CHEAT )
 	
 end
 
@@ -349,16 +349,16 @@ function SWEP:GetSpeedRatio()
 end
 
 if CLIENT then
-	local cl_crosshaircolor = GetConVar( "cl_crosshaircolor" )
-	local cl_dynamiccrosshair = GetConVar( "cl_dynamiccrosshair" )
-	local cl_scalecrosshair = GetConVar( "cl_scalecrosshair" )
-	local cl_crosshairscale = GetConVar( "cl_crosshairscale" )
-	local cl_crosshairalpha = GetConVar( "cl_crosshairalpha" )
-	local cl_crosshairusealpha = GetConVar( "cl_crosshairusealpha" )
+	local cl_crosshaircolor = GetConVar( "cl_cs_crosshaircolor" )
+	local cl_dynamiccrosshair = GetConVar( "cl_cs_dynamiccrosshair" )
+	local cl_scalecrosshair = GetConVar( "cl_cs_scalecrosshair" )
+	local cl_crosshairscale = GetConVar( "cl_cs_crosshairscale" )
+	local cl_crosshairalpha = GetConVar( "cl_cs_crosshairalpha" )
+	local cl_crosshairusealpha = GetConVar( "cl_cs_crosshairusealpha" )
 	
-	local cl_bobcycle = GetConVar( "cl_bobcycle" )
-	local cl_bob = GetConVar( "cl_bob" )
-	local cl_bobup = GetConVar( "cl_bobup" )
+	local cl_bobcycle = GetConVar( "cl_cs_bobcycle" )
+	local cl_bob = GetConVar( "cl_cs_bob" )
+	local cl_bobup = GetConVar( "cl_cs_bobup" )
 	
 	SWEP.LastAmmoCheck = 0
 	

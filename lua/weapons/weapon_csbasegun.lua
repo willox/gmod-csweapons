@@ -229,6 +229,7 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 	local soundType = "single_shot"
 	
 	--Valve's horrible hacky balance
+	--Jvs: TODO , implement this either in the parser or directly on the weapon itself
 	
 	if self:GetWeaponID() == CS_WEAPON_GLOCK then
 		if not primarymode then
@@ -265,7 +266,7 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 		ply:FireBullets {
 			AmmoType = self.Primary.Ammo,
 			Distance = pCSInfo.Range,
-			Tracer = 2,
+			Tracer = 1,
 			Attacker = ply,
 			Damage = iDamage,
 			Src = ply:GetShootPos(),
@@ -274,6 +275,13 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 			Callback = function( hitent , trace , dmginfo )
 				--TODO: range damage modifiers ( aka falloff ) and penetration
 				--unfortunately this can't be done with a static function or we'd need to set global variables for range and shit
+				
+				--Jvs:	rough range modifier, I don't even know if this is accurate at all due to our implementations of bullets
+				--		compared to valve , but it's good enough for now
+				
+				if flRangeModifier then
+					dmginfo:SetDamage( Lerp( trace.Fraction , dmginfo:GetDamage() , dmginfo:GetDamage() * flRangeModifier ) )
+				end
 			end
 		}
 	end

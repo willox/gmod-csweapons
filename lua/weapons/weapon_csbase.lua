@@ -232,6 +232,7 @@ end
 function SWEP:Idle()
 	if CurTime() > self:GetNextIdle() then
 		self:SendWeaponAnim( self:TranslateViewModelActivity( ACT_VM_IDLE ) )
+		self:SetNextIdle( CurTime() + self:GetWeaponInfo().IdleInterval )
 	end
 end
 
@@ -262,7 +263,6 @@ function SWEP:WeaponSound( soundtype )
 	local sndname = self:GetWeaponInfo().SoundData[soundtype]
 	
 	if sndname then
-		
 		self:EmitSound( sndname , nil , nil , nil , CHAN_AUTO )
 	end
 end

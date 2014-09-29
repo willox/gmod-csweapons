@@ -267,7 +267,6 @@ function CSParseWeaponInfo( self,  str )
 	local convertedvm = self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" )
 	
 	if file.Exists( convertedvm , "GAME" ) then
-		print( file.Exists( convertedvm , "GAME" ) )
 		self.ViewModel = convertedvm
 	else
 		self.ViewModelFlip = self._WeaponInfo.BuiltRightHanded == 0

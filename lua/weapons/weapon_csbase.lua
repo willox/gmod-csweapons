@@ -194,7 +194,7 @@ function SWEP:Think()
 		-- Add them to the clip
 		self:SetClip1( self:Clip1() + j )
 		pPlayer:RemoveAmmo( j, self:GetPrimaryAmmoType() )
-
+		
 		self:SetInReload( false )
 	end
 	

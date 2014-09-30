@@ -273,14 +273,13 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 			Dir = dir,
 			Spread = vector_origin,
 			Callback = function( hitent , trace , dmginfo )
-				--TODO: range damage modifiers ( aka falloff ) and penetration
+				--TODO: penetration
 				--unfortunately this can't be done with a static function or we'd need to set global variables for range and shit
 				
-				--Jvs:	rough range modifier, I don't even know if this is accurate at all due to our implementations of bullets
-				--		compared to valve , but it's good enough for now
-				
 				if flRangeModifier then
-					dmginfo:SetDamage( Lerp( trace.Fraction , dmginfo:GetDamage() , dmginfo:GetDamage() * flRangeModifier ) )
+					--Jvs: the damage modifier valve actually uses
+					local flCurrentDistance = trace.Fraction * pCSInfo.Range
+					dmginfo:SetDamage( dmginfo:GetDamage() * math.pow( flRangeModifier, ( flCurrentDistance / 500 ) ) )
 				end
 			end
 		}

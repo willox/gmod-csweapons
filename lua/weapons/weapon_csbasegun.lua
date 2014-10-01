@@ -316,7 +316,7 @@ if CLIENT then
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
 		
 		if event == 5001 or event == 5011 or event == 5021 or event == 5031 then
-			if self:IsSilenced() then
+			if self:IsSilenced() or self:IsScoped() then
 				return true
 			end
 			

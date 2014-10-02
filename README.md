@@ -26,6 +26,8 @@ M4A1 completed.
 
 USP45 completed.
 
+P90 completed.
+
 Glock almost completed, only the burstfire needs to be the same as the original.
 
 =====================================================

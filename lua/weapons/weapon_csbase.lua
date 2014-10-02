@@ -348,7 +348,14 @@ function SWEP:GetSpeedRatio()
 	return self:GetWeaponInfo().MaxPlayerSpeed / 250
 end
 
-if CLIENT then
+if SERVER then
+
+	function SWEP:OnDrop()
+		self:SetInReload( false )
+	end
+
+else
+
 	local cl_crosshaircolor = GetConVar( "cl_cs_crosshaircolor" )
 	local cl_dynamiccrosshair = GetConVar( "cl_cs_dynamiccrosshair" )
 	local cl_scalecrosshair = GetConVar( "cl_cs_scalecrosshair" )

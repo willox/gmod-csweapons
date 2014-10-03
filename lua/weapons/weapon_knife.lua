@@ -17,14 +17,14 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"CanEquipWithShield"		"1"
 	
 	
-	-- Weapon characteristics:
+	// Weapon characteristics:
 	"Penetration"			"1"
 	"Damage"			"50"
 	"Range"				"4096"
 	"RangeModifier"			"0.99"
 	"Bullets"			"1"
 	
-	-- Weapon data is loaded by both the Game and Client DLLs.
+	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_Knife"
 	"viewmodel"			"models/weapons/v_knife_t.mdl"
 	"playermodel"			"models/weapons/w_knife_t.mdl"
@@ -41,7 +41,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"weight"			"0"
 	"item_flags"			"0"
 
-	-- Sounds for the weapon. There is a max of 16 sounds per category (i.e. max 16 "single_shot" sounds)
+	// Sounds for the weapon. There is a max of 16 sounds per category (i.e. max 16 "single_shot" sounds)
 	SoundData
 	{
 		"reload"			"Default.Reload"
@@ -49,7 +49,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 		"single_shot"		"Weapon_DEagle.Single"
 	}
 
-	-- Weapon Sprite data is loaded by the Client DLL.
+	// Weapon Sprite data is loaded by the Client DLL.
 	TextureData
 	{
 		"weapon"
@@ -150,10 +150,12 @@ end
 
 function SWEP:Initialize()
 	self:SetClip1( -1 )
-	BaseClass.Initialize()
+	BaseClass.Initialize( self )
+	self:SetHoldType( "knife" )
 end
 
 function SWEP:SetupDataTables()
+	BaseClass.SetupDataTables( self )
 	self:NetworkVar( "Float" , 5 , "SmackTime" )
 	self:NetworkVar( "Entity" , 0 , "HitEntity" )
 	self:NetworkVar( "Bool" , 4 , "IsStab" )
@@ -206,7 +208,7 @@ function SWEP:SwingOrStab( bStab )
 
 	if tr.Fraction >= 1 then
 		tr = util.TraceHull { start = vecSrc, endpos = vecEnd, mins = head_hull_mins, maxs = head_hull_maxs, MASK_SOLID, filter = pPlayer }
-		if tr.fraction < 1 then
+		if tr.Fraction < 1 then
 			-- Calculate the point of intersection of the line (or hull) and the object we hit
 			-- This is and approximation of the "best" intersection
 			local pHit = tr.Entity
@@ -219,7 +221,7 @@ function SWEP:SwingOrStab( bStab )
 		end
 	end
 
-	local bDidHit = tr.fraction < 1 and not tr.HitSky
+	local bDidHit = tr.Fraction < 1 and not tr.HitSky
 
 	local bFirstSwing = ( self:GetNextPrimaryAttack() + 0.4 ) < CurTime()
 
@@ -234,7 +236,7 @@ function SWEP:SwingOrStab( bStab )
 	
 	fSecDelay = fPrimDelay
 	
-	self:SendWeaponAnim( bDidHit and ACT_VM_HITCENTER or ACT_VM_MISSCENTER )
+	self:SendWeaponAnim( bDidHit and ACT_VM_PRIMARYATTACK or ACT_VM_MISSCENTER )
 	pPlayer:DoAttackEvent()
 
 	self:SetNextPrimaryAttack( CurTime() + fPrimDelay )
@@ -253,7 +255,7 @@ function SWEP:SwingOrStab( bStab )
 		if bStab then
 			flDamage = 65
 
-			if IsValid( pEntity ) and pEntity:IsPlayer() then
+			if IsValid( pEntity ) and ( pEntity:IsPlayer() or pEntity:IsNPC() ) then
 				local vTragetForward = pEntity:GetAngles():Forward()
 				--Jvs TODO: finish converting
 				local vecLOS = pEntity:GetPos() - pPlayer:GetPos()
@@ -286,31 +288,40 @@ function SWEP:SwingOrStab( bStab )
 		info:SetInflictor( self )
 		info:SetDamage( flDamage )
 		info:SetDamageType( bit.bor( DMG_BULLET , DMG_NEVERGIB ) )
-		
 		pEntity:DispatchTraceAttack( info, tr, vForward )
 	end
 
-	if bDidHit then
+	--if bDidHit then
 		-- delay the decal a bit
 		self:SetHitEntity( tr.Entity )
 		self:SetIsStab( bStab )
 		self:SetSmackTime( CurTime() + ( bStab and 0.2 or 0.1 ) )
-	
-	end
+	--end
 	
 	self:GetOwner():LagCompensation( false )
 end
 
-function SWEP:Smack()
-	
-	if not IsValid( self:GetHitEntiy() ) then return end
+function SWEP:SendWeaponAnimFix( seqstr , slot , rate )
+	local vm = self:GetOwner():GetViewModel( slot or 0 )
+	if IsValid( vm ) then
+		local seq = vm:LookupSequence( seqstr )
+		vm:SendViewModelMatchingSequence( seq )
+		vm:SetPlaybackRate( rate or 1 )
+	end
+end
 
-	if self:GetHitEntiy():IsPlayer() then
+function SWEP:Smack()
+	if self:GetHitEntity() == NULL then return end
+	
+	if self:GetHitEntity():IsPlayer() or self:GetHitEntity():IsNPC() then
 		self:EmitSound( self:GetIsStab() and "Weapon_Knife.Stab" or "Weapon_Knife.Hit" )
 	else
 		self:EmitSound( "Weapon_Knife.HitWall" )
 	end
 	
+	
+	self:SetHitEntity( NULL )
+	self:SetIsStab( false )
 	
 	--[[
 	CEffectData data
@@ -335,9 +346,7 @@ function SWEP:Smack()
 	data.m_fFlags = 0x1	--IMPACT_NODECAL
 	te->DispatchEffect( filter, 0.0, data.m_vOrigin, "KnifeSlash", data )
 	]]
-	
-	self:SetHitEntity( NULL )
-	self:SetIsStab( false )
+
 end
 
 function SWEP:Idle()

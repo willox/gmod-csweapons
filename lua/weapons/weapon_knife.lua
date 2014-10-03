@@ -155,6 +155,8 @@ end
 
 function SWEP:SetupDataTables()
 	self:NetworkVar( "Float" , 5 , "SmackTime" )
+	self:NetworkVar( "Entity" , 0 , "HitEntity" )
+	self:NetworkVar( "Bool" , 4 , "IsStab" )
 end
 
 function SWEP:Deploy()
@@ -217,9 +219,9 @@ function SWEP:SwingOrStab( bStab )
 		end
 	end
 
-	local bDidHit = tr.fraction < 1
+	local bDidHit = tr.fraction < 1 and not tr.HitSky
 
-	local bFirstSwing = (self:GetNextPrimaryAttack() + 0.4) < CurTime()
+	local bFirstSwing = ( self:GetNextPrimaryAttack() + 0.4 ) < CurTime()
 
 	local fPrimDelay, fSecDelay
 
@@ -238,15 +240,11 @@ function SWEP:SwingOrStab( bStab )
 	self:SetNextSecondaryAttack( CurTime() + fSecDelay )
 	self:SetNextIdle( CurTime() + 2 )
 	
-	if not bDidHit
+	if not bDidHit then
 		-- play wiff or swish sound
 		self:EmitSound( "Weapon_Knife.Slash" )
-	end
-
-
-	if bDidHit then
-		-- play thwack, smack, or dong sound
-
+	else	
+	-- play thwack, smack, or dong sound
 		local pEntity = tr.Entity
 		
 		local flDamage = 42
@@ -291,50 +289,32 @@ function SWEP:SwingOrStab( bStab )
 		pEntity:DispatchTraceAttack( info, tr, vForward )
 	end
 
-	--[[
 	if bDidHit then
 		-- delay the decal a bit
-		m_trHit = tr
-		
-		-- Store the ent in an EHANDLE, just in case it goes away by the time we get into our think function.
-		m_pTraceHitEnt = tr.m_pEnt 
-
-		m_bStab = bStab	--store this so we know what hit sound to play
-
-		m_flSmackTime = gpGlobals->curtime + (bStab?0.2f:0.1f)
-	}
-	]]
+		self:SetHitEntity( tr.Entity )
+		self:SetIsStab( bStab )
+		self:SetSmackTime( CurTime() + ( bStab and 0.2 or 0.1 ) )
 	
+	end
 	
 	self:GetOwner():LagCompensation( false )
 end
 
 function SWEP:Smack()
+	
+	if not IsValid( self:GetHitEntiy() ) then return end
+
+
+	CPASAttenuationFilter filter( this )
+	filter.UsePredictionRules()
+
+	if self:GetHitEntiy():IsPlayer() then
+		self:EmitSound( self:GetIsStab() and "Weapon_Knife.Stab" or "Weapon_Knife.Hit" )
+	else
+		self:EmitSound( "Weapon_Knife.HitWall" )
+	end
+	
 	--[[
-
-	m_trHit.m_pEnt = m_pTraceHitEnt
-
-	if ( !m_trHit.m_pEnt || (m_trHit.surface.flags & SURF_SKY) )
-		return
-
-	if ( m_trHit.fraction == 1.0 )
-		return
-
-	if ( m_trHit.m_pEnt )
-	{
-		CPASAttenuationFilter filter( this )
-		filter.UsePredictionRules()
-
-		if( m_trHit.m_pEnt->IsPlayer()  )
-		{
-			EmitSound( filter, entindex(), m_bStab?"Weapon_Knife.Stab":"Weapon_Knife.Hit" )
-		}
-		else
-		{
-			EmitSound( filter, entindex(), "Weapon_Knife.HitWall" )
-		}
-	}
-
 	CEffectData data
 	data.m_vOrigin = m_trHit.endpos
 	data.m_vStart = m_trHit.startpos
@@ -357,6 +337,7 @@ function SWEP:Smack()
 	data.m_fFlags = 0x1	--IMPACT_NODECAL
 	te->DispatchEffect( filter, 0.0, data.m_vOrigin, "KnifeSlash", data )
 	]]
+	self:SetHitEntity( NULL )
 end
 
 function SWEP:Idle()

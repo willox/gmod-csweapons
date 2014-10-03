@@ -192,79 +192,6 @@ end
 
 function SWEP:SwingOrStab( bStab )
 	self:GetOwner():LagCompensation( true )
-	
-	
-	
-	self:GetOwner():LagCompensation( false )
-end
-
-function SWEP:Smack()
-
-end
-
-function SWEP:Idle()
-	if self:GetNextIdle() > CurTime() then return end
-	
-	self:SetNextIdle( CurTime() + 20 )
-	self:SendWeaponAnim( ACT_VM_IDLE )
-end
-
---[[
-
-
-void CKnife::Smack( void )
-{
-	if ( !GetPlayerOwner() )
-		return
-
-	m_trHit.m_pEnt = m_pTraceHitEnt
-
-	if ( !m_trHit.m_pEnt || (m_trHit.surface.flags & SURF_SKY) )
-		return
-
-	if ( m_trHit.fraction == 1.0 )
-		return
-
-	if ( m_trHit.m_pEnt )
-	{
-		CPASAttenuationFilter filter( this )
-		filter.UsePredictionRules()
-
-		if( m_trHit.m_pEnt->IsPlayer()  )
-		{
-			EmitSound( filter, entindex(), m_bStab?"Weapon_Knife.Stab":"Weapon_Knife.Hit" )
-		}
-		else
-		{
-			EmitSound( filter, entindex(), "Weapon_Knife.HitWall" )
-		}
-	}
-
-	CEffectData data
-	data.m_vOrigin = m_trHit.endpos
-	data.m_vStart = m_trHit.startpos
-	data.m_nSurfaceProp = m_trHit.surface.surfaceProps
-	data.m_nDamageType = DMG_SLASH
-	data.m_nHitBox = m_trHit.hitbox
-#ifdef CLIENT_DLL
-	data.m_hEntity = m_trHit.m_pEnt->GetRefEHandle()
-#else
-	data.m_nEntIndex = m_trHit.m_pEnt->entindex()
-#endif
-
-	CPASFilter filter( data.m_vOrigin )
-	
-#ifndef CLIENT_DLL
-	filter.RemoveRecipient( GetPlayerOwner() )
-#endif
-
-	data.m_vAngles = GetPlayerOwner()->GetAbsAngles()
-	data.m_fFlags = 0x1	--IMPACT_NODECAL
-	te->DispatchEffect( filter, 0.0, data.m_vOrigin, "KnifeSlash", data )
-}
-
-bool CKnife::SwingOrStab( bool bStab )
-{	
 	loacl pPlayer = self:GetOwner()
 	
 	local fRange = bStab and 32 or 48 -- knife range
@@ -330,41 +257,42 @@ bool CKnife::SwingOrStab( bool bStab )
 			if IsValid( pEntity ) and pEntity:IsPlayer() then
 				local vTragetForward = pEntity:GetAngles():Forward()
 				--Jvs TODO: finish converting
-				local vecLOS = (pEntity->GetAbsOrigin() - pPlayer->GetAbsOrigin()).AsVector2D()
-				Vector2DNormalize( vecLOS )
-
-				float flDot = vecLOS.Dot( vTragetForward.AsVector2D() )
+				local vecLOS = pEntity:GetPos() - pPlayer:GetPos()
+				vecLOS.z = 0
+				
+				vecLOS:Normalize()
+				
+				local vTragetForward2d = vTragetForward
+				vTragetForward2d.z = 0
+				
+				local flDot = vecLOS:Dot( vTragetForward2d )
 
 				--Triple the damage if we are stabbing them in the back.
-				if ( flDot > 0.80f )
-					 flDamage *= 3
-			}
-		}
+				if flDot > 0.80 then
+					 flDamage = flDamage * 3
+				end
+			end
 		else
-		{
-			if ( bFirstSwing )
-			{
+			if bFirstSwing then
 				-- first swing does full damage
 				flDamage = 20
-			}
 			else
-			{
 				-- subsequent swings do less	
 				flDamage = 15
-			}
-		}
+			end
+		end
 
-		CTakeDamageInfo info( pPlayer, pPlayer, flDamage, DMG_BULLET | DMG_NEVERGIB )
+		local info = DamageInfo()
+		info:SetAttacker( pPlayer )
+		info:SetInflictor( self )
+		info:SetDamage( flDamage )
+		info:SetDamageType( bit.bor( DMG_BULLET , DMG_NEVERGIB ) )
+		
+		pEntity:DispatchTraceAttack( info, tr, vForward )
+	end
 
-		CalculateMeleeDamageForce( &info, vForward, tr.endpos, 1.0f/flDamage )
-		pEntity->DispatchTraceAttack( info, vForward, &tr ) 
-		ApplyMultiDamage()
-	}
-
-#endif
-
-	if ( bDidHit )
-	{
+	--[[
+	if bDidHit then
 		-- delay the decal a bit
 		m_trHit = tr
 		
@@ -375,7 +303,66 @@ bool CKnife::SwingOrStab( bool bStab )
 
 		m_flSmackTime = gpGlobals->curtime + (bStab?0.2f:0.1f)
 	}
+	]]
+	
+	
+	self:GetOwner():LagCompensation( false )
+end
 
-	return bDidHit
-}
-]]
+function SWEP:Smack()
+	--[[
+
+	m_trHit.m_pEnt = m_pTraceHitEnt
+
+	if ( !m_trHit.m_pEnt || (m_trHit.surface.flags & SURF_SKY) )
+		return
+
+	if ( m_trHit.fraction == 1.0 )
+		return
+
+	if ( m_trHit.m_pEnt )
+	{
+		CPASAttenuationFilter filter( this )
+		filter.UsePredictionRules()
+
+		if( m_trHit.m_pEnt->IsPlayer()  )
+		{
+			EmitSound( filter, entindex(), m_bStab?"Weapon_Knife.Stab":"Weapon_Knife.Hit" )
+		}
+		else
+		{
+			EmitSound( filter, entindex(), "Weapon_Knife.HitWall" )
+		}
+	}
+
+	CEffectData data
+	data.m_vOrigin = m_trHit.endpos
+	data.m_vStart = m_trHit.startpos
+	data.m_nSurfaceProp = m_trHit.surface.surfaceProps
+	data.m_nDamageType = DMG_SLASH
+	data.m_nHitBox = m_trHit.hitbox
+#ifdef CLIENT_DLL
+	data.m_hEntity = m_trHit.m_pEnt->GetRefEHandle()
+#else
+	data.m_nEntIndex = m_trHit.m_pEnt->entindex()
+#endif
+
+	CPASFilter filter( data.m_vOrigin )
+	
+#ifndef CLIENT_DLL
+	filter.RemoveRecipient( GetPlayerOwner() )
+#endif
+
+	data.m_vAngles = GetPlayerOwner()->GetAbsAngles()
+	data.m_fFlags = 0x1	--IMPACT_NODECAL
+	te->DispatchEffect( filter, 0.0, data.m_vOrigin, "KnifeSlash", data )
+	]]
+end
+
+function SWEP:Idle()
+	if self:GetNextIdle() > CurTime() then return end
+	
+	self:SetNextIdle( CurTime() + 20 )
+	self:SendWeaponAnim( ACT_VM_IDLE )
+end
+

@@ -194,7 +194,7 @@ end
 
 function SWEP:SwingOrStab( bStab )
 	self:GetOwner():LagCompensation( true )
-	loacl pPlayer = self:GetOwner()
+	local pPlayer = self:GetOwner()
 	
 	local fRange = bStab and 32 or 48 -- knife range
 	
@@ -227,11 +227,12 @@ function SWEP:SwingOrStab( bStab )
 
 	if bStab then
 		fPrimDelay = bDidHit and 1.1 or 1
-		fSecDelay = fPrimDelay
+		
 	else -- swing
 		fPrimDelay = bDidHit and 0.5 or 0.4
-		fSecDelay = 0.5
 	end
+	
+	fSecDelay = fPrimDelay
 	
 	self:SendWeaponAnim( bDidHit and ACT_VM_HITCENTER or ACT_VM_MISSCENTER )
 	pPlayer:DoAttackEvent()
@@ -304,15 +305,12 @@ function SWEP:Smack()
 	
 	if not IsValid( self:GetHitEntiy() ) then return end
 
-
-	CPASAttenuationFilter filter( this )
-	filter.UsePredictionRules()
-
 	if self:GetHitEntiy():IsPlayer() then
 		self:EmitSound( self:GetIsStab() and "Weapon_Knife.Stab" or "Weapon_Knife.Hit" )
 	else
 		self:EmitSound( "Weapon_Knife.HitWall" )
 	end
+	
 	
 	--[[
 	CEffectData data
@@ -337,7 +335,9 @@ function SWEP:Smack()
 	data.m_fFlags = 0x1	--IMPACT_NODECAL
 	te->DispatchEffect( filter, 0.0, data.m_vOrigin, "KnifeSlash", data )
 	]]
+	
 	self:SetHitEntity( NULL )
+	self:SetIsStab( false )
 end
 
 function SWEP:Idle()

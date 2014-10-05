@@ -303,12 +303,14 @@ if CLIENT then
 	end
 	
 	function SWEP:GetTracerOrigin()
+		--[[
 		if IsValid( self:GetOwner() ) then
 			local viewmodel = self:GetOwner():GetViewModel( 0 )
 			local attch = viewmodel:GetAttachment( "2" )
 			if not attch then return end
 			return attch.Pos
 		end
+		]]
 	end
 	
 	--copied straight from weapon_base

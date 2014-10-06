@@ -78,7 +78,7 @@ function ENT:Detonate()
 	end
 end
 
-function ENT:Touch( otherent )
+function ENT:TouchExplode( otherent )
 	local tr
 	local vecSpot
 	

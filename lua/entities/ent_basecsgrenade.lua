@@ -78,6 +78,21 @@ function ENT:Detonate()
 	end
 end
 
+function ENT:Touch( otherent )
+	if otherent == self:GetThrower() then
+		return
+	end
+	
+	--Jvs: doesn't work apparently?
+	self:BounceSound()
+end
+
+function ENT:BounceSound()
+
+end
+
+
+
 function ENT:TouchExplode( otherent )
 	local tr
 	local vecSpot

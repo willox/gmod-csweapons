@@ -13,15 +13,16 @@ function ENT:Detonate()
 	self:Remove()
 end
 
+
 function ENT:BounceSound()
 	self:EmitSound( "Flashbang.Bounce" )
 end
 
-local PercentageOfFlashForEntity( pPlayer , flashPos , pevInflictor )
+local function PercentageOfFlashForEntity( pEntity , flashPos , pevInflictor )
 	local retval = 0
 	local tr
 	
-	local pos = pPlayer:EyePos()
+	local pos = pEntity:EyePos()
 	local vecRight , vecUp
 	
 	local tempAngle = pos - flashPos
@@ -39,13 +40,15 @@ local PercentageOfFlashForEntity( pPlayer , flashPos , pevInflictor )
 		mask = bit.bor( CONTENTS_SOLID , CONTENTS_MOVEABLE , CONTENTS_DEBRIS , CONTENTS_MONSTER ),
 		filter = pevInflictor
 	}
-	if tr.Fraction == 1 or tr.Entity == pPlayer then
+	if tr.Fraction == 1 or tr.Entity == pEntity then
 		return 1
 	end
 	
+	--[[
 	if not pPlayer:IsPlayer() then
 		return 0
 	end
+	]]
 	
 	for i = 1 , 3 do
 	
@@ -62,7 +65,7 @@ local PercentageOfFlashForEntity( pPlayer , flashPos , pevInflictor )
 			filter = pevInflictor
 		}
 		
-		pos = pPlayer:EyePos()
+		pos = pEntity:EyePos()
 		
 		tr = util.TraceLine {
 			start = tr.HitPos,
@@ -71,7 +74,7 @@ local PercentageOfFlashForEntity( pPlayer , flashPos , pevInflictor )
 			filter = pevInflictor
 		}
 		
-		if tr.Fraction == 1 or tr.Entity == pPlayer then
+		if tr.Fraction == 1 or tr.Entity == pEntity then
 			retval = retval + 0.167
 		end
 		
@@ -159,14 +162,13 @@ function ENT:RadiusFlash( pos , inflictor , attacker , damage , damagetype )
 	
 	local te = EffectData()
 	te:SetOrigin( pos )
-	te:SetEntityIndex( self:EntIndex() )
+	te:SetEntityIndex( self:EntIndex() )	--used only for the dynamic light index, doesn't matter if the entity goes invalid afterwards
 	
 	util.Effect( "flashbang_light" , te )
 end
 
 function ENT:BlindPlayer( pPlayer , holdTime , fadeTime , startingAlpha )
-	local clr = Color( 255 , 255 , 255 , 255 )
-	clr.a = startingAlpha
+	local clr = Color( 255 , 255 , 255 , startingAlpha )
 	
 	if pPlayer:GetObserverMode() ~= OBS_MODE_NONE and pPlayer:GetObserverMode() ~= OBS_MODE_IN_EYE then
 		clr.a = 150

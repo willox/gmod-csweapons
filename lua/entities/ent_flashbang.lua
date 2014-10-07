@@ -3,7 +3,9 @@ AddCSLuaFile()
 DEFINE_BASECLASS( "ent_basecsgrenade" )
 
 function ENT:Initialize()
-	self:SetModel( "models/Weapons/w_eq_flashbang_thrown.mdl" )
+	if SERVER then
+		self:SetModel( "models/weapons/w_eq_flashbang_thrown.mdl" )
+	end
 	BaseClass.Initialize( self )	--Jvs: garry's setmodel crap also sets the collision bounds, so I have to do this here last
 end
 

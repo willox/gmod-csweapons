@@ -2,16 +2,18 @@ AddCSLuaFile()
 DEFINE_BASECLASS( "base_entity" )
 
 function ENT:Initialize()
-	self:SetSolid( SOLID_BBOX )
-	self:SetCollisionBounds( Vector( -2 , -2 , -2 ) , Vector( 2 , 2 , 2 ) )
-	self:SetSpawnTime( CurTime() )
-	self:SetMoveType( MOVETYPE_FLYGRAVITY )
-	self:SetMoveCollide( MOVECOLLIDE_FLY_BOUNCE )	--MOVECOLLIDE_FLY_CUSTOM	--Jvs: how the crap am I gonna implement this
-	self:SetGravity( 0.4 )
-	self:SetFriction( 0.2 )
-	self:SetElasticity( 0.45 )
-	self:SetShakeRadius( 0 )
-	self:SetShakeAmplitude( 0 )
+	if SERVER then
+		self:SetSolid( SOLID_BBOX )
+		self:SetCollisionBounds( Vector( -2 , -2 , -2 ) , Vector( 2 , 2 , 2 ) )
+		self:SetSpawnTime( CurTime() )
+		self:SetMoveType( MOVETYPE_FLYGRAVITY )
+		self:SetMoveCollide( MOVECOLLIDE_FLY_BOUNCE )	--MOVECOLLIDE_FLY_CUSTOM	--Jvs: how the crap am I gonna implement this
+		self:SetGravity( 0.4 )
+		self:SetFriction( 0.2 )
+		self:SetElasticity( 0.45 )
+		self:SetShakeRadius( 0 )
+		self:SetShakeAmplitude( 0 )
+	end
 end
 
 function ENT:SetupDataTables()

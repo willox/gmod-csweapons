@@ -196,7 +196,6 @@ function ENT:DeafenPlayer( pPlayer , flDistance )
 		else
 			return
 		end
-		print( "BOOM" , effect )
 		pPlayer:SetDSP( effect , false )
 	end
 end

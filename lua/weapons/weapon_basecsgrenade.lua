@@ -1,8 +1,6 @@
 AddCSLuaFile()
 DEFINE_BASECLASS( "weapon_csbase" )
 
-SWEP.Primary.DefaultClip = 10
-
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
 	--Jvs TODO: set the normal holdtype to slam, then when the user holds the firebutton down switch to grenade
@@ -109,7 +107,8 @@ function SWEP:Think()
 		self:SendWeaponAnim( ACT_VM_THROW )
 		self:SetNextPrimaryAttack( CurTime() + self:SequenceDuration() )
 		self:SetNextIdle( CurTime() + self:SequenceDuration() )
-	elseif self:GetThrowTime() > 0 and self:GetThrowTime() < CurTime() and self:GetNextPrimaryAttack() <= CurTime() then
+		self:SetNextSecondaryAttack( CurTime() + self:SequenceDuration() )
+	elseif self:GetThrowTime() > 0 and self:GetThrowTime() < CurTime() then
 		self:GetOwner():RemoveAmmo( 1 , self:GetPrimaryAmmoType() )
 		self:ThrowGrenade()
 	elseif self:GetRedraw() then
@@ -121,13 +120,17 @@ function SWEP:Think()
 			return
 		else
 			--self:GetOwner():SwitchToNextBestweapon ????
-			self:Reload()
 		end
-			
-		
+		self:Idle()
 		--return
 	elseif not self:GetRedraw() then
 		BaseClass.Think( self )
+	end
+end
+
+function SWEP:Idle()
+	if self:GetNextIdle() < CurTime() and self:GetRedraw() then
+		self:Reload()
 	end
 end
 

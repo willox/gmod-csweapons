@@ -26,7 +26,7 @@ local function PercentageOfFlashForEntity( pEntity , flashPos , pevInflictor )
 	local vecRight , vecUp
 	
 	local tempAngle = pos - flashPos
-	tempAngle = tempAngle:ToAngle()
+	tempAngle = tempAngle:Angle()
 	
 	vecRight = tempAngle:Right()
 	vecUp = tempAngle:Up()
@@ -83,7 +83,7 @@ local function PercentageOfFlashForEntity( pEntity , flashPos , pevInflictor )
 	return retval
 end
 
-function ENT:RadiusFlash( pos , inflictor , attacker , damage , damagetype )
+function ENT:RadiusFlash( pos , inflictor , attacker , flDamage , damagetype )
 	pos.z = pos.z + 1
 	if not IsValid( attacker ) then
 		attacker = inflictor
@@ -92,7 +92,8 @@ function ENT:RadiusFlash( pos , inflictor , attacker , damage , damagetype )
 	local tr
 	local flAdjustedDamage
 	local vecEyePos
-	local fadeTime , fadeHold
+	local fadeTime = 0
+	local fadeHold = 0
 	local vForward
 	local vecLOS
 	local flDot
@@ -102,11 +103,11 @@ function ENT:RadiusFlash( pos , inflictor , attacker , damage , damagetype )
 	
 	local bInWater = util.PointContents( pos ) == CONTENTS_WATER
 	
-	for _ , pEntity in pairs( ents.FindInSphere( pos , flRadius ) do
+	for _ , pEntity in pairs( ents.FindInSphere( pos , flRadius ) ) do
 		local bPlayer = pEntity:IsPlayer()
 		local bHostage = pEntity:GetClass() == "hostage_entity"
 		
-		if bPlayer or bHostage then
+		if not bPlayer and not bHostage then
 			continue
 		end
 		
@@ -120,7 +121,7 @@ function ENT:RadiusFlash( pos , inflictor , attacker , damage , damagetype )
 			continue
 		end
 		
-		local percentageOfFlash = PercentageOfFlashForEntity( pEntity , pos , pevInflictor )
+		local percentageOfFlash = PercentageOfFlashForEntity( pEntity , pos , inflictor )
 		if percentageOfFlash > 0 then
 			flAdjustedDamage = flDamage - ( pos - vecEyePos ):Length() * falloff
 			if flAdjustedDamage > 0 then
@@ -130,7 +131,7 @@ function ENT:RadiusFlash( pos , inflictor , attacker , damage , damagetype )
 				
 				vecLOS:Normalize()
 				
-				flDot = vecLos:Dot( vForward )
+				flDot = vecLOS:Dot( vForward )
 				
 				local startingAlpha = 255
 				
@@ -153,7 +154,7 @@ function ENT:RadiusFlash( pos , inflictor , attacker , damage , damagetype )
 					self:BlindPlayer( pEntity , fadeHold , fadeTime , startingAlpha )
 					self:DeafenPlayer( pEntity , flDistance )
 				elseif bHostage then
-					pEntity:Input( "flashbang" , pevInflictor , pevAttacker , fadeTime )
+					pEntity:Input( "flashbang" , inflictor , attacker , fadeTime )
 				end
 				
 			end
@@ -162,7 +163,7 @@ function ENT:RadiusFlash( pos , inflictor , attacker , damage , damagetype )
 	
 	local te = EffectData()
 	te:SetOrigin( pos )
-	te:SetEntityIndex( self:EntIndex() )	--used only for the dynamic light index, doesn't matter if the entity goes invalid afterwards
+	te:SetMaterialIndex( self:EntIndex() )	--used only for the dynamic light index, doesn't matter if the entity goes invalid afterwards
 	
 	util.Effect( "flashbang_light" , te )
 end
@@ -185,14 +186,15 @@ function ENT:DeafenPlayer( pPlayer , flDistance )
 		local effect
 		
 		if flDistance < 600 then
-			effect = 134
+			effect = 35--134
 		elseif flDistance < 800 then
-			effect = 135
+			effect = 36--135
 		elseif flDistance < 1000 then
-			effect = 136
+			effect = 37--136
 		else
 			return
 		end
+		print( "BOOM" , effect )
 		pPlayer:SetDSP( effect , false )
 	end
 end

@@ -107,17 +107,18 @@ function SWEP:EmitGrenade( vecSrc , vecAngles , vecVel , angImpulse , pPlayer )
 	local pGrenade = ents.Create( "ent_flashbang" )
 	if not pGrenade then return end
 	
+	pGrenade:Spawn()
 	pGrenade:SetOwner( pPlayer )
 	pGrenade:SetPos( vecSrc )
 	pGrenade:SetAngles( vecAngles )
-	pGrenade:SetAbsVelocity( vecVel )
+	pGrenade:SetVelocity( vecVel )
 	pGrenade:SetInitialVelocity( vecVel )
-	pGrenade:Spawn()
+	
 	
 	pGrenade:SetThrower( pPlayer )
 	pGrenade:SetDamage( 100 )
 	pGrenade:SetDetonateTimerLength( 1.5 )
-	pGrenade:SetLocalAngularVelocity( angImpulse + pGrenade:GetLocalAngularVelocity() )
+	pGrenade:SetLocalAngularVelocity( angImpulse:Angle() + pGrenade:GetLocalAngularVelocity() )
 	
 end
 

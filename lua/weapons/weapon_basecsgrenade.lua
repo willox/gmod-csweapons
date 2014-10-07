@@ -1,6 +1,7 @@
 AddCSLuaFile()
 DEFINE_BASECLASS( "weapon_csbase" )
 
+SWEP.Primary.DefaultClip = 10
 
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
@@ -94,36 +95,37 @@ function SWEP:Reload()
 		self:SetNextPrimaryAttack( CurTime() + self:SequenceDuration() )
 		self:SetNextIdle( CurTime() + self:SequenceDuration() )
 		self:SetNextSecondaryAttack( CurTime() + self:SequenceDuration() )
+		self:SetRedraw( false )
 	end
 end
 
 function SWEP:Think()
 	local cmd = self:GetOwner():GetCurrentCommand()
 	
-	if self:GetPinPulled() and not cmd:KeyDown( IN_ATTACK ) then
+	if self:GetPinPulled() and not cmd:KeyDown( IN_ATTACK )  then
 		self:GetOwner():DoAttackEvent()
 		self:SetThrowTime( CurTime() + 0.1 )
 		self:SetPinPulled( false )
 		self:SendWeaponAnim( ACT_VM_THROW )
 		self:SetNextPrimaryAttack( CurTime() + self:SequenceDuration() )
 		self:SetNextIdle( CurTime() + self:SequenceDuration() )
-	elseif self:GetThrowTime() > 0 and self:GetThrowTime() < CurTime() then
-		self:GetOwner():Remove( 1 , self:GetPrimaryAmmoType() )
+	elseif self:GetThrowTime() > 0 and self:GetThrowTime() < CurTime() and self:GetNextPrimaryAttack() <= CurTime() then
+		self:GetOwner():RemoveAmmo( 1 , self:GetPrimaryAmmoType() )
 		self:ThrowGrenade()
 	elseif self:GetRedraw() then
-		if self:GetNextIdle() < CurTime() then
-			
+		if self:GetOwner():GetAmmoCount( self:GetPrimaryAmmoType() ) <= 0 then
 			if SERVER then
-				if self:GetOwner():GetAmmoCount( self:GetPrimaryAmmoType() ) <= 0 then
-					self:GetOwner():DropWeapon( self )
-					self:Remove()
-				else
-					--self:GetOwner():SwitchToNextBestweapon ????
-				end
+				self:GetOwner():DropWeapon( self )
+				self:Remove()
 			end
-			
 			return
+		else
+			--self:GetOwner():SwitchToNextBestweapon ????
+			self:Reload()
 		end
+			
+		
+		--return
 	elseif not self:GetRedraw() then
 		BaseClass.Think( self )
 	end
@@ -133,7 +135,7 @@ function SWEP:ThrowGrenade()
 	self:SetRedraw( true )
 	self:SetThrowTime( 0 )
 	
-	self:GetOwner():EmitSound( "citadel.br_youfool" )
+	self:GetOwner():EmitSound( "Weapon_Grenade.Throw" )
 	
 	if SERVER then
 		local angThrow = self:GetOwner():EyeAngles()

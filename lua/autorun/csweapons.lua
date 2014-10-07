@@ -61,9 +61,9 @@ CS_MAX_45ACP = 		100
 CS_MAX_356SIG = 	52
 CS_MAX_57MM = 		100
 
--- CS_HEGRENADE = 		"AMMO_TYPE_HEGRENADE"
--- CS_FLASHBANG = 		"AMMO_TYPE_FLASHBANG"
--- CS_SMOKEGRENADE = 	"AMMO_TYPE_SMOKEGRENADE"
+CS_HEGRENADE = 		"AMMO_TYPE_HEGRENADE"
+CS_FLASHBANG = 		"AMMO_TYPE_FLASHBANG"
+CS_SMOKEGRENADE = 	"AMMO_TYPE_SMOKEGRENADE"
 
 game.AddAmmoType {
 	name = CS_50AE,
@@ -173,6 +173,39 @@ game.AddAmmoType {
 	force = 2000,
 	minsplash = 4,
 	maxsplash = 8
+}
+
+game.AddAmmoType {
+	name = CS_HEGRENADE,
+	dmgtype = DMG_BLAST,
+	tracer = TRACER_NONE,
+	plydmg = 0,
+	npcdmg = 0,
+	force = 0,
+	minsplash = 0,
+	maxsplash = 0
+}
+
+game.AddAmmoType {
+	name = CS_FLASHBANG,
+	dmgtype = DMG_BLAST,
+	tracer = TRACER_NONE,
+	plydmg = 0,
+	npcdmg = 0,
+	force = 0,
+	minsplash = 0,
+	maxsplash = 0
+}
+
+game.AddAmmoType {
+	name = CS_FLASHBANG,
+	dmgtype = DMG_BLAST,
+	tracer = TRACER_NONE,
+	plydmg = 0,
+	npcdmg = 0,
+	force = 0,
+	minsplash = 0,
+	maxsplash = 0
 }
 
 --[[

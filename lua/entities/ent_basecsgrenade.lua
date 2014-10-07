@@ -2,6 +2,7 @@ AddCSLuaFile()
 DEFINE_BASECLASS( "base_entity" )
 
 function ENT:Initialize()
+	if CLIENT then return end
 	self:SetSolid( SOLID_BBOX )
 	self:SetCollisionBounds( Vector( -2 , -2 , -2 ) , Vector( 2 , 2 , 2 ) )
 	self:SetSpawnTime( CurTime() )
@@ -170,7 +171,7 @@ if CLIENT then
 		-- still playing his throw animation.
 		if IsValid( self:GetThrower() ) then
 			if CurTime() - self:GetSpawnTime() < 0.5 then
-				return
+				--return
 			end
 		end
 		

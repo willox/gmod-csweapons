@@ -1,7 +1,7 @@
 AddCSLuaFile()
 
 function EFFECT:Init( data )
-	self.EntIndex = data:GetEntIndex()
+	self.EntIndex = data:GetMaterialIndex()
 	self.Origin = data:GetOrigin()
 	self.Exponent = 2
 	self.Radius = 400
@@ -16,11 +16,11 @@ function EFFECT:Init( data )
 	self.DynamicLight.b = color_white.b
 	self.DynamicLight.decay = self.Decay
 	self.DynamicLight.brightness = self.Exponent
-	
+	self.DieTime = CurTime() + self.Time
 end
 
 function EFFECT:Think()
-	return self.DynamicLight and self.DynamicLight.dietime > CurTime()
+	return self.DynamicLight and self.DieTime
 end
 
 function EFFECT:Render()

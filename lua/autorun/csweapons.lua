@@ -312,6 +312,9 @@ function CSParseWeaponInfo( self,  str )
 	if CLIENT then
 		if self._WeaponInfo.TextureData then
 			killicon.AddFont( class , CS_KILLICON_FONT , self._WeaponInfo.TextureData.weapon.character:lower() , Color( 255, 80, 0, 255 ) )
+			if self.ProjectileClass then
+				killicon.AddAlias( self.ProjectileClass, class )
+			end
 		end
 	end
 end

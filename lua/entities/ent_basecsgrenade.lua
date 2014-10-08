@@ -106,14 +106,47 @@ local function PhysicsClipVelocity( in, normal, out, overbounce )
 	
 	angle = normal[ 2 ]
 	
-	backoff = in:DotProduct( normal) * overbounce
+	backoff = in:DotProduct( normal ) * overbounce
 
 	for i = 0 , 2 do
 		change = normal[i] * backoff
 		out[i] = in[i] - change
-		if out[i] > -STOP_EPSILON && out[i] < STOP_EPSILON then
+		if out[i] > -STOP_EPSILON and out[i] < STOP_EPSILON then
 			out[i] = 0
 		end
+	end
+end
+
+
+local function PhysicsCheckSweep( pEntity, vecAbsStart, vecAbsDelta, pTrace )
+	local mask = MASK_SOLID 	--Jvs: fuck, no binding for it pEntity->PhysicsSolidMaskForEntity()
+	
+	
+	local vecAbsEnd = vecAbsStart + vecAbsDelta
+	-- Set collision type
+	if not pEntity:IsSolid() then --|| pEntity->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS) )
+		if IsValid( pEntity:GetMoveParent() ) then
+			pTrace.Fraction = 1
+			pTrace.FractionLeftSolid = 0
+			return
+		end
+	end
+	--[[
+	UTIL_TraceEntity( pBaseEntity, vecAbsStart, vecAbsEnd, mask, pTrace )
+	]]
+end
+
+
+function ENT:PhysicsPushEntity( push, pTrace )
+	-- NOTE: absorigin and origin must be equal because there is no moveparent
+	local prevOrigin = self:GetPos() * 1
+	PhysicsCheckSweep( this, prevOrigin, push, pTrace )
+
+	if pTrace.Fraction == 1 then
+		self:SetPos( pTrace.HitPos )
+
+		-- FIXME(ywb):  Should we try to enable this here
+		-- WakeRestingObjects()
 	end
 end
 
@@ -202,18 +235,20 @@ function ENT:ResolveFlyCollisionCustom( trace , vecVelocity )
 			-- TODO: rotate around trace.plane.normal
 			
 			self:SetAngles( angle )			
-		--Jvs: don't care about entity pushing
-		--[[
 		else
-			local vecDelta = GetBaseVelocity() - vecAbsVelocity	
-			Vector vecBaseDir = GetBaseVelocity()
-			VectorNormalize( vecBaseDir )
-			float flScale = vecDelta.Dot( vecBaseDir )
-
-			VectorScale( vecAbsVelocity, ( 1.0f - trace.fraction ) * gpGlobals->frametime, vecVelocity ) 
-			VectorMA( vecVelocity, ( 1.0f - trace.fraction ) * gpGlobals->frametime, GetBaseVelocity() * flScale, vecVelocity )
-			PhysicsPushEntity( vecVelocity, &trace )
-		]]
+			local vecDelta = vecVelocity - vecAbsVelocity	
+			local vecBaseDir = vecVelocity
+			vecBaseDir:Normalize()
+			
+			local flScale = vecDelta:Dot( vecBaseDir )
+			
+			local ft = ( 1.0 - trace.Fraction ) * FrameTime()
+			
+			vecVelocity = vecAbsVelocity * ft
+			
+			vecVelocity = vecVelocity + ( vecDelta * flScale ) * ft
+			
+			self:PhysicsPushEntity( vecVelocity, trace )
 		end
 		
 	else

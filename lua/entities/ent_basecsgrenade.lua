@@ -7,7 +7,8 @@ function ENT:Initialize()
 	self:SetCollisionBounds( Vector( -2 , -2 , -2 ) , Vector( 2 , 2 , 2 ) )
 	self:SetSpawnTime( CurTime() )
 	self:SetMoveType( MOVETYPE_FLYGRAVITY )
-	self:SetMoveCollide( MOVECOLLIDE_FLY_BOUNCE )	--MOVECOLLIDE_FLY_CUSTOM	--Jvs: how the crap am I gonna implement this
+	self:SetMoveCollide( MOVECOLLIDE_FLY_CUSTOM )
+	--self:SetMoveCollide( MOVECOLLIDE_FLY_BOUNCE )	--MOVECOLLIDE_FLY_CUSTOM	--Jvs: how the crap am I gonna implement this
 	self:SetGravity( 0.4 )
 	self:SetFriction( 0.2 )
 	self:SetElasticity( 0.45 )
@@ -79,12 +80,15 @@ function ENT:Detonate()
 	end
 end
 
+function ENT:StartTouch( otherent )
+	self:ResolveFlyCollisionCustom( self:GetTouchTrace() , self:GetVelocity() )
+end
+
 function ENT:Touch( otherent )
 	if otherent == self:GetThrower() then
 		return
 	end
 	
-	--Jvs: doesn't work apparently?
 	self:BounceSound()
 end
 
@@ -92,6 +96,141 @@ function ENT:BounceSound()
 
 end
 
+local function PhysicsClipVelocity( in, normal, out, overbounce )
+	local	backoff
+	local	change
+	local	angle
+	local	i
+	
+	local STOP_EPSILON = 0.1
+	
+	angle = normal[ 2 ]
+	
+	backoff = in:DotProduct( normal) * overbounce
+
+	for i = 0 , 2 do
+		change = normal[i] * backoff
+		out[i] = in[i] - change
+		if out[i] > -STOP_EPSILON && out[i] < STOP_EPSILON then
+			out[i] = 0
+		end
+	end
+end
+
+local function IsStandable( ent )
+	return ent:GetSolid() == SOLID_BSP or ent:GetSolid() == SOLID_VPHYSICS or ent:GetSolid() == SOLID_BBOX
+end
+
+function ENT:ResolveFlyCollisionCustom( trace , vecVelocity )
+	
+	--Assume all surfaces have the same elasticity
+	local flSurfaceElasticity = 1
+
+	--Don't bounce off of players with perfect elasticity
+	if IsValid( trace.Entity ) and trace.Entity:IsPlayer() then
+		flSurfaceElasticity = 0.3
+	end
+
+	-- if its breakable glass and we kill it, don't bounce.
+	-- give some damage to the glass, and if it breaks, pass 
+	-- through it.
+	local breakthrough = false
+
+	if IsValid( trace.Entity ) and trace.Entity:GetClass() == "func_breakable" then
+		breakthrough = true
+	end
+
+	if IsValid( trace.Entity ) and trace.Entity:GetClass() == "func_breakable_surf" then
+		breakthrough = true
+	end
+
+	if breakthrough then
+		local info = DamageInfo()
+		info:SetAttacker( self )
+		info:SetInflictor( self )
+		info:SetDamageForce( vecVelocity )
+		info:SetDamagePosition( self:GetPos() )
+		info:SetDamageType( DMG_CLUB )
+		info:SetDamage( 10 )
+		trace.Entity:DispatchTraceAttack( info , trace , vecVelocity )
+		
+		if trace.Entity:Health() <= 0 then
+			-- slow our flight a little bit
+			local vel = vecVelocity
+
+			vel = vel * 0.4
+
+			self:SetVelocity( vel )
+			return
+		end
+	end
+	
+	local flTotalElasticity = self:GetElasticity() * flSurfaceElasticity
+	flTotalElasticity = math.Clamp( flTotalElasticity, 0, 0.9 )
+
+	-- NOTE: A backoff of 2.0f is a reflection
+	local vecAbsVelocity = Vector()
+	PhysicsClipVelocity( vecVelocity, trace.Normal, vecAbsVelocity, 2.0 )
+	vecAbsVelocity = vecAbsVelocity * flTotalElasticity
+
+	-- Get the total velocity (player + conveyors, etc.)
+	--VectorAdd( vecAbsVelocity, GetBaseVelocity(), vecVelocity )
+	local flSpeedSqr = vecVelocity:DotProduct( vecVelocity )
+
+	-- Stop if on ground.
+	if trace.Normal.z > 0.7 then			-- Floor
+		-- Verify that we have an entity.
+		local pEntity = trace.Entity
+		
+		SetVelocity( vecAbsVelocity )
+
+		if flSpeedSqr < ( 30 * 30 ) then
+			if IsStandable( pEntity ) then
+				self:SetGroundEntity( pEntity )
+			end
+
+			-- Reset velocities.
+			self:SetVelocity( vector_origin )
+			self:SetLocalAngularVelocity( angle_zero )
+
+			--align to the ground so we're not standing on end
+			local angle = trace.Normal:Angle()
+
+			-- rotate randomly in yaw
+			angle[1] = math.random( 0, 360 )
+
+			-- TODO: rotate around trace.plane.normal
+			
+			self:SetAngles( angle )			
+		--Jvs: don't care about entity pushing
+		--[[
+		else
+			local vecDelta = GetBaseVelocity() - vecAbsVelocity	
+			Vector vecBaseDir = GetBaseVelocity()
+			VectorNormalize( vecBaseDir )
+			float flScale = vecDelta.Dot( vecBaseDir )
+
+			VectorScale( vecAbsVelocity, ( 1.0f - trace.fraction ) * gpGlobals->frametime, vecVelocity ) 
+			VectorMA( vecVelocity, ( 1.0f - trace.fraction ) * gpGlobals->frametime, GetBaseVelocity() * flScale, vecVelocity )
+			PhysicsPushEntity( vecVelocity, &trace )
+		]]
+		end
+		
+	else
+		-- If we get *too* slow, we'll stick without ever coming to rest because
+		-- we'll get pushed down by gravity faster than we can escape from the wall.
+		if flSpeedSqr < ( 30 * 30 ) then
+			-- Reset velocities.
+			self:SetVelocity( vector_origin )
+			self:SetLocalAngularVelocity( angle_zero )
+		else
+			self:SetVelocity( vecAbsVelocity )
+		end
+	end
+	
+	self:BounceSound()
+
+end
 
 
 function ENT:TouchExplode( otherent )
@@ -123,7 +262,7 @@ function ENT:Explode( tr , dmgtype )
 	if tr.Fraction ~= 1 then
 		local vecNormal = tr.Normal
 		--[[
-		te->Explosion( filter, -1.0, // don't apply cl_interp delay
+		te->Explosion( filter, -1.0, -- don't apply cl_interp delay
 			&vecAbsOrigin,
 			!( contents & MASK_WATER ) ? g_sModelIndexFireball : g_sModelIndexWExplosion,
 			m_DmgRadius * .03, 
@@ -132,20 +271,20 @@ function ENT:Explode( tr , dmgtype )
 			m_DmgRadius,
 			m_flDamage,
 			&vecNormal,
-			(char) pdata->game.material );
+			(char) pdata->game.material )
 		]]--Jvs : TODO
 		
 		te:SetOrigin( vecAbsOrigin )
 	else
 		--[[
-			te->Explosion( filter, -1.0, // don't apply cl_interp delay
+			te->Explosion( filter, -1.0, -- don't apply cl_interp delay
 			&vecAbsOrigin, 
 			!( contents & MASK_WATER ) ? g_sModelIndexFireball : g_sModelIndexWExplosion,
 			m_DmgRadius * .03, 
 			25,
 			TE_EXPLFLAG_NONE,
 			m_DmgRadius,
-			m_flDamage );
+			m_flDamage )
 		]]
 		te:SetOrigin( vecAbsOrigin )
 	end

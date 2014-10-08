@@ -2,7 +2,6 @@ AddCSLuaFile()
 
 function EFFECT:Init( data )
 	self._EntIndex = data:GetMaterialIndex()
-	print( self._EntIndex )
 	self.Origin = data:GetOrigin()
 	self.Exponent = 2
 	self.Radius = 400

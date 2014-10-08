@@ -96,21 +96,21 @@ function ENT:BounceSound()
 
 end
 
-local function PhysicsClipVelocity( in, normal, out, overbounce )
+local function PhysicsClipVelocity( inv, normal, out, overbounce )
 	local	backoff
-	local	change
+	local	change = 0
 	local	angle
 	local	i
 	
 	local STOP_EPSILON = 0.1
 	
-	angle = normal[ 2 ]
+	angle = normal.z
 	
-	backoff = in:DotProduct( normal ) * overbounce
-
-	for i = 0 , 2 do
+	backoff = inv:DotProduct( normal ) * overbounce
+	
+	for i = 1 , 3 do
 		change = normal[i] * backoff
-		out[i] = in[i] - change
+		out[i] = inv[i] - change
 		if out[i] > -STOP_EPSILON and out[i] < STOP_EPSILON then
 			out[i] = 0
 		end
@@ -140,7 +140,7 @@ end
 function ENT:PhysicsPushEntity( push, pTrace )
 	-- NOTE: absorigin and origin must be equal because there is no moveparent
 	local prevOrigin = self:GetPos() * 1
-	PhysicsCheckSweep( this, prevOrigin, push, pTrace )
+	PhysicsCheckSweep( self, prevOrigin, push, pTrace )
 
 	if pTrace.Fraction == 1 then
 		self:SetPos( pTrace.HitPos )
@@ -176,7 +176,7 @@ function ENT:ResolveFlyCollisionCustom( trace , vecVelocity )
 	if IsValid( trace.Entity ) and trace.Entity:GetClass() == "func_breakable_surf" then
 		breakthrough = true
 	end
-
+	--[[
 	if breakthrough then
 		local info = DamageInfo()
 		info:SetAttacker( self )
@@ -197,6 +197,7 @@ function ENT:ResolveFlyCollisionCustom( trace , vecVelocity )
 			return
 		end
 	end
+	]]
 	
 	local flTotalElasticity = self:GetElasticity() * flSurfaceElasticity
 	flTotalElasticity = math.Clamp( flTotalElasticity, 0, 0.9 )
@@ -215,8 +216,7 @@ function ENT:ResolveFlyCollisionCustom( trace , vecVelocity )
 		-- Verify that we have an entity.
 		local pEntity = trace.Entity
 		
-		SetVelocity( vecAbsVelocity )
-
+		self:SetVelocity( vecAbsVelocity )
 		if flSpeedSqr < ( 30 * 30 ) then
 			if IsStandable( pEntity ) then
 				self:SetGroundEntity( pEntity )
@@ -235,7 +235,10 @@ function ENT:ResolveFlyCollisionCustom( trace , vecVelocity )
 			-- TODO: rotate around trace.plane.normal
 			
 			self:SetAngles( angle )			
+		
 		else
+		
+			
 			local vecDelta = vecVelocity - vecAbsVelocity	
 			local vecBaseDir = vecVelocity
 			vecBaseDir:Normalize()
@@ -249,7 +252,9 @@ function ENT:ResolveFlyCollisionCustom( trace , vecVelocity )
 			vecVelocity = vecVelocity + ( vecDelta * flScale ) * ft
 			
 			self:PhysicsPushEntity( vecVelocity, trace )
+			
 		end
+		
 		
 	else
 		-- If we get *too* slow, we'll stick without ever coming to rest because

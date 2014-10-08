@@ -177,6 +177,8 @@ function ENT:BlindPlayer( pPlayer , holdTime , fadeTime , startingAlpha )
 		clr.a = 150
 		fadeTime = math.min( fadeTime , 0.5 )				-- make sure the spectator flashbang time is 1/2 second or less.
 		holdTime = math.min( holdTime , fadeTime * 0.5 )	-- adjust the hold time to match the fade time.
+	else
+		fadeTime = fadeTime / 1.4
 	end
 	
 	--Jvs: there's some other code here about extending the duration if the user is already blinded but I don't give a damn

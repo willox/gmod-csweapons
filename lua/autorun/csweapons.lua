@@ -279,6 +279,11 @@ function CSParseWeaponInfo( self,  str )
 	self._WeaponInfo = wepinfotab
 	self.PrintName = self._WeaponInfo.printname
 	
+	self.DrawWeaponInfoBox = false
+	self.BounceWeaponIcon = false
+	
+	self.ScriptedEntityType = "cssweapon"
+	
 	self.Category = "Counter Strike: Source"
 	
 	self.CSMuzzleFlashes = true
@@ -329,36 +334,91 @@ hook.Add( "SetupMove" , "CSS - Speed Modify" , function( ply , mv , cmd )
 	end
 end)
 
-local function f(t,u)
-	language.Add('Cstrike_WPNHUD_'..t,u or t)
-end
+if CLIENT then 
 
-f("AK47","AK-47")
-f"Aug"
-f"AWP"
-f("DesertEagle","Desert Eagle")
-f"Elites"
-f"Famas"
-f"FiveSeven"
-f"Flashbang"
-f"G3SG1"
-f"Galil"
-f("Glock18","Glock 18")
-f("HE_Grenade","HE Grenade")
-f"Knife"
-f"M249"
-f"m3"
-f"M4A1"
-f"MAC10"
-f"MP5"
-f"P228"
-f"P90"
-f"Scout"
-f"SG550"
-f"SG552"
-f("Smoke_Grenade","Smoke grenade")
-f"Tmp"
-f"UMP45"
-f"USP45"
-f"xm1014"
-f"C4"	
+	local function f(t,u)
+		language.Add('Cstrike_WPNHUD_'..t,u or t)
+	end
+
+	f("AK47","AK-47")
+	f"Aug"
+	f"AWP"
+	f("DesertEagle","Desert Eagle")
+	f"Elites"
+	f"Famas"
+	f"FiveSeven"
+	f"Flashbang"
+	f"G3SG1"
+	f"Galil"
+	f("Glock18","Glock 18")
+	f("HE_Grenade","HE Grenade")
+	f"Knife"
+	f"M249"
+	f"m3"
+	f"M4A1"
+	f"MAC10"
+	f"MP5"
+	f"P228"
+	f"P90"
+	f"Scout"
+	f"SG550"
+	f"SG552"
+	f("Smoke_Grenade","Smoke grenade")
+	f"Tmp"
+	f"UMP45"
+	f"USP45"
+	f"xm1014"
+	f"C4"	
+
+
+
+	spawnmenu.AddContentType( "cssweapon", function( container, obj )
+
+			if ( !obj.material ) then return end
+			if ( !obj.nicename ) then return end
+			if ( !obj.spawnname ) then return end
+
+			local icon = vgui.Create( "ContentIcon", container )
+					icon:SetContentType( "weapon" )
+					icon:SetSpawnName( obj.spawnname )
+					icon:SetName( obj.nicename )
+					MsgN("H >> ",obj.nicename or "eek")
+					icon:SetMaterial( 'vgui/gfx/vgui/sg550' )
+					icon:SetAdminOnly( obj.admin )
+					icon:SetColor( Color( 255, 206, 0, 255 ) )
+					icon.DoClick = function()
+
+													RunConsoleCommand( "gm_giveswep", obj.spawnname )
+													surface.PlaySound( "ui/buttonclickrelease.wav" )
+
+											end
+
+					icon.DoMiddleClick = function()
+
+													RunConsoleCommand( "gm_spawnswep", obj.spawnname )
+													surface.PlaySound( "ui/buttonclickrelease.wav" )
+
+											end
+
+
+					icon.OpenMenu = function( icon )
+
+													local menu = DermaMenu()
+															menu:AddOption( "Copy to Clipboard", function() SetClipboardText( obj.spawnname ) end )
+															menu:AddOption( "Spawn Using Toolgun", function() RunConsoleCommand( "gmod_tool", "creator" ) RunConsoleCommand( "creator_type", "3" ) RunConsoleCommand( "creator_name", obj.spawnname ) end )
+															menu:AddSpacer()
+															menu:AddOption( "Delete", function() icon:Remove() hook.Run( "SpawnlistContentChanged", icon ) end )
+													menu:Open()
+
+													end
+
+
+			if ( IsValid( container ) ) then
+					container:Add( icon )
+			end
+
+			return icon
+
+	end )
+
+end

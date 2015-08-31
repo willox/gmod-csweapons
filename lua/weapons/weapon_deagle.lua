@@ -163,4 +163,9 @@ function SWEP:GunFire( spread , mode )
 	end
 	
 	self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, mode  )
+	
+	if not self:GetOwner():IsValid() then return end
+
+	self:GetOwner():ViewPunch( Angle(-2,0,0) )
+	
 end

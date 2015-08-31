@@ -317,7 +317,7 @@ function CSParseWeaponInfo( self,  str )
 	end
 	
 	self.WorldModel = self._WeaponInfo.playermodel
-	self.ViewModelFOV = 45
+	self.ViewModelFOV = 60
 	self.Weight = self._WeaponInfo.weight
 	self.m_WeaponDeploySpeed = 1
 	if CLIENT then

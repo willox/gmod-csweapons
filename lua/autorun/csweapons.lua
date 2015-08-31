@@ -326,3 +326,37 @@ hook.Add( "SetupMove" , "CSS - Speed Modify" , function( ply , mv , cmd )
 		mv:SetMaxClientSpeed( mv:GetMaxClientSpeed() * weapon:GetSpeedRatio() )
 	end
 end)
+
+local function f(t,u)
+	language.Add('Cstrike_WPNHUD_'..t,u or t)
+end
+
+f("AK47","AK-47")
+f"Aug"
+f"AWP"
+f("DesertEagle","Desert Eagle")
+f"Elites"
+f"Famas"
+f"FiveSeven"
+f"Flashbang"
+f"G3SG1"
+f"Galil"
+f"Glock 18"
+f("HE_Grenade","HE Grenade")
+f"Knife"
+f"M249"
+f"m3"
+f"M4A1"
+f"MAC10"
+f"MP5"
+f"P228"
+f"P90"
+f"Scout"
+f"SG550"
+f"SG552"
+f("Smoke_Grenade","Smoke grenade")
+f"Tmp"
+f"UMP45"
+f"USP45"
+f"xm1014"
+f"C4"	

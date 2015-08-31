@@ -5,6 +5,7 @@ DEFINE_BASECLASS( "weapon_csbase" )
 SWEP.Spawnable = false
 SWEP.UseHands = true
 SWEP.DrawAmmo = true
+SWEP.Category = "Counter Strike: Source"
 
 
 function SWEP:Initialize()

@@ -30,7 +30,7 @@ if CLIENT then
 	
 	function SWEP:DrawWeaponSelection( x, y, wide, tall, alpha )
 
-		draw.SimpleText(self._WeaponInfo.TextureData.weapon.character:lower(), CSTypeDeath, x + wide/2, y + tall*0.2, Color( 255, 210, 0, alpha ), TEXT_ALIGN_CENTER)
+		draw.SimpleText(self._WeaponInfo.TextureData.weapon.character:lower(), "CSTypeDeath", x + wide/2, y + tall*0.2, Color( 255, 210, 0, alpha ), TEXT_ALIGN_CENTER)
 
 	end
 	

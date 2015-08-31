@@ -88,7 +88,7 @@ function ENT:Touch( otherent )
 end
 
 function ENT:PhysicsCollide( data, phys )
-	if data.Speed > 50 then self:BounceSound() end
+	if data.Speed > 22 then self:BounceSound() end
 end
 
 function ENT:BounceSound()

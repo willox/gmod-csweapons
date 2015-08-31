@@ -5,7 +5,6 @@ DEFINE_BASECLASS( "weapon_csbase" )
 SWEP.Spawnable = false
 SWEP.UseHands = true
 SWEP.DrawAmmo = true
-SWEP.Category = "Counter Strike: Source"
 
 
 function SWEP:Initialize()
@@ -212,9 +211,9 @@ end
 function SWEP:ToggleBurstFire()
 	if IsValid( self:GetOwner() ) and self:GetOwner():IsPlayer() then
 		if self:GetBurstFireEnabled() then
-			self:GetOwner():PrintMessage( HUD_PRINTCENTER, "#Switch_To_SemiAuto" )
+			--self:GetOwner():PrintMessage( HUD_PRINTCENTER, "#Switch_To_SemiAuto" )
 		else
-			self:GetOwner():PrintMessage( HUD_PRINTCENTER, "#Switch_To_BurstFire" )
+			--self:GetOwner():PrintMessage( HUD_PRINTCENTER, "#Switch_To_BurstFire" )
 		end
 	end
 	

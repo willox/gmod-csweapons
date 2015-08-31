@@ -3,7 +3,6 @@ AddCSLuaFile()
 SWEP.Spawnable = false
 SWEP.UseHands = true
 SWEP.DrawAmmo = true
-SWEP.Category = "Counter Strike: Source"
 
 SWEP.CSSWeapon = true
 

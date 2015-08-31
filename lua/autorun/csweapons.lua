@@ -279,6 +279,8 @@ function CSParseWeaponInfo( self,  str )
 	self._WeaponInfo = wepinfotab
 	self.PrintName = self._WeaponInfo.printname
 	
+	self.Category = "Counter Strike: Source"
+	
 	self.CSMuzzleFlashes = true
 	
 	if self._WeaponInfo.MuzzleFlashStyle == "CS_MUZZLEFLASH_X" then
@@ -341,7 +343,7 @@ f"FiveSeven"
 f"Flashbang"
 f"G3SG1"
 f"Galil"
-f"Glock 18"
+f("Glock18","Glock 18")
 f("HE_Grenade","HE Grenade")
 f"Knife"
 f"M249"

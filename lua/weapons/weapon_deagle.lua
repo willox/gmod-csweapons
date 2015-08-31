@@ -162,10 +162,14 @@ function SWEP:GunFire( spread , mode )
 		self:SetAccuracy( 0.55 )
 	end
 	
-	self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, mode  )
+	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, mode  ) then
+		return
+	end
 	
-	if not self:GetOwner():IsValid() then return end
-
-	self:GetOwner():ViewPunch( Angle(-2,0,0) )
+	--Python: this is so goddamn lame
+	
+	local a=self:GetOwner():GetViewPunchAngles( ) 
+	a.p = a.p - 2 
+	self:GetOwner():SetViewPunchAngles( a )
 	
 end

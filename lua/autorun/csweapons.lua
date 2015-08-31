@@ -262,10 +262,14 @@ if CLIENT then
 	})
 	
 end
+local classlist = {}
 
 function CSParseWeaponInfo( self,  str )
 	local class = self.Folder:Replace( ".lua" , "" )
 	class = class:Replace( "weapons/" , "" )
+	
+	classlist[class] = true
+	
 	local wepinfotab = util.KeyValuesToTable( str, nil , true )
 	
 	--Jvs: should never happen, but you never know with garry's baseclass stuff
@@ -336,6 +340,17 @@ end)
 
 if CLIENT then 
 
+	hook.Add("Initialize","cssweapons",function()
+		local t = list.GetForEdit "Weapon"
+		for class,_ in next,classlist do
+			local data = t[class]
+			print(data,class)
+			if data then
+				data.ScriptedEntityType = "cssweapon"
+			end
+		end
+	end)
+
 	local function f(t,u)
 		language.Add('Cstrike_WPNHUD_'..t,u or t)
 	end
@@ -378,15 +393,23 @@ if CLIENT then
 			if ( !obj.nicename ) then return end
 			if ( !obj.spawnname ) then return end
 
-			local icon = vgui.Create( "ContentIcon", container )
-					icon:SetContentType( "weapon" )
-					icon:SetSpawnName( obj.spawnname )
-					icon:SetName( obj.nicename )
-					MsgN("H >> ",obj.nicename or "eek")
-					icon:SetMaterial( 'vgui/gfx/vgui/sg550' )
-					icon:SetAdminOnly( obj.admin )
-					icon:SetColor( Color( 255, 206, 0, 255 ) )
-					icon.DoClick = function()
+			local icon = vgui.Create( "SpawnIcon" )
+			icon:SetSize( 64, 64 )
+			
+			local wep = weapons.GetStored( obj.spawnname )
+			icon:SetModel( wep.WorldModel or "models/weapons/w_rif_ak47.mdl" )
+			
+			icon:SetTooltip( obj.nicename )
+			
+			icon.Label = icon:Add( "DLabel" )
+			icon.Label:Dock( BOTTOM )
+			icon.Label:SetContentAlignment( 2 )
+			icon.Label:DockMargin( 4, 0, 4, 10 )
+			icon.Label:SetTextColor( Color( 255, 255, 255, 255 ) )
+			icon.Label:SetExpensiveShadow( 1, Color( 0, 0, 0, 200 ) )
+			icon.Label:SetText(obj.nicename)
+			
+						icon.DoClick = function()
 
 													RunConsoleCommand( "gm_giveswep", obj.spawnname )
 													surface.PlaySound( "ui/buttonclickrelease.wav" )

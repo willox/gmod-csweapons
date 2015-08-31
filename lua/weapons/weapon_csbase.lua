@@ -28,6 +28,12 @@ if CLIENT then
 	local cl_bob = CreateConVar( "cl_cs_bob" , "0.002" , FCVAR_ARCHIVE + FCVAR_CHEAT )
 	local cl_bobup = CreateConVar( "cl_cs_bobup" , "0.5" , FCVAR_ARCHIVE + FCVAR_CHEAT )
 	
+	function SWEP:DrawWeaponSelection( x, y, wide, tall, alpha )
+
+		draw.SimpleText(self._WeaponInfo.TextureData.weapon.character:lower(), CSTypeDeath, x + wide/2, y + tall*0.2, Color( 255, 210, 0, alpha ), TEXT_ALIGN_CENTER)
+
+	end
+	
 end
 
 function SWEP:Initialize()

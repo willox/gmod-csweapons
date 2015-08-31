@@ -358,11 +358,6 @@ if CLIENT then
 		return BaseClass.DoDrawCrosshair( self , x , y )
 	end
 	
-	function SWEP:DrawWeaponSelection( x, y, wide, tall, alpha )
-
-		draw.SimpleText(self._WeaponInfo.TextureData.weapon.character:lower(), CSTypeDeath, x + wide/2, y + tall*0.2, Color( 255, 210, 0, alpha ), TEXT_ALIGN_CENTER)
-
-	end
 
 	
 	--Jvs: should this technically be done in DoDrawCrosshair? DrawHUD is technically drawn in the gmod hud element

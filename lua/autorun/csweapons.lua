@@ -344,7 +344,6 @@ if CLIENT then
 		local t = list.GetForEdit "Weapon"
 		for class,_ in next,classlist do
 			local data = t[class]
-			print(data,class)
 			if data then
 				data.ScriptedEntityType = "cssweapon"
 			end

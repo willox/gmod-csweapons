@@ -154,3 +154,7 @@ function SWEP:GunFire( spread )
 		self:KickBack( 0.725, 0.375, 0.15, 0.025, 2.75, 2.25, 9 )
 	end
 end
+
+function SWEP:FireAnimationEvent()
+	return true
+end

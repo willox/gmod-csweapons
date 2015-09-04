@@ -147,7 +147,7 @@ function SWEP:GunFire( spread )
 	if not self:GetOwner():OnGround() then
 		self:KickBack( 1.1, 0.5, 0.35, 0.045, 4.5, 3.5, 6 )
 	elseif self:GetOwner():GetAbsVelocity():Length2D() > 5 then
-		self:KickBack( 0.8, 0.4, 0.2, 0.03, 3, 2.5,  )
+		self:KickBack( 0.8, 0.4, 0.2, 0.03, 3, 2.5, 7  )
 	elseif self:GetOwner():Crouching() then
 		self:KickBack( 0.7, 0.35, 0.125, 0.025, 2.5, 2, 10 )
 	else

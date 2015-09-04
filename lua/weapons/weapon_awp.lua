@@ -134,8 +134,6 @@ end
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
 	
-	--Jvs: valve sure is good at pulling values out of their ass
-	
 	if not self:GetOwner():OnGround() then
 		self:GunFire( .85 )
 	elseif self:GetOwner():GetAbsVelocity():Length2D() > 140 then
@@ -152,7 +150,7 @@ end
 function SWEP:GunFire( spread )
 	
 	--if (self:GetOwner():GetFOV() == pPlayer->GetDefaultFOV() || (gpGlobals->curtime < m_zoomFullyActiveTime)) then
-		flSpread = flSpread + .08
+		spread = spread + .08
 	--end
 	
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then

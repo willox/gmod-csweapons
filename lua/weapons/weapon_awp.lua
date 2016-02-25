@@ -156,7 +156,7 @@ function SWEP:SecondaryAttack()
 	if not IsValid(pPlayer) then
 		return;
 	end
-	if (self:GetZoomFullyActiveTime() > CurTime()) then
+	if (self:GetZoomFullyActiveTime() > CurTime() or self:GetNextPrimaryAttack() > CurTime()) then
 		self:SetNextSecondaryFire(self:GetZoomFullyActiveTime() + 0.15)
 		return
 	end

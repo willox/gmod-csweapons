@@ -53,6 +53,7 @@ function SWEP:Deploy()
 	self:SetStoredFOVRatio(1)
 	self:SetTargetFOVStartTime(0)
 	self:SetTargetFOVTime(0)
+    self:SetResumeZoom(false)
 
 	return BaseClass.Deploy( self )
 end

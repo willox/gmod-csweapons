@@ -210,7 +210,7 @@ game.AddAmmoType {
 
 --[[
 	load the keyvalues from a string and parses it
-	
+
 	NOTE:	this function should be called right after AddCSLuaFile() on the SWEP object
 			see ak47
 ]]
@@ -252,7 +252,7 @@ wepinfo_meta.__index = wepinfo_meta
 
 if CLIENT then
 	CS_KILLICON_FONT = "CSTypeDeath"
-	
+
 	surface.CreateFont( CS_KILLICON_FONT ,
 	{
 		font		= "csd",
@@ -260,62 +260,63 @@ if CLIENT then
 		antialias	= true,
 		weight		= 300
 	})
-	
+
 end
+
 local classlist = {}
 
 function CSParseWeaponInfo( self,  str )
 	local class = self.Folder:Replace( ".lua" , "" )
 	class = class:Replace( "weapons/" , "" )
-	
+
 	classlist[class] = true
-	
+
 	local wepinfotab = util.KeyValuesToTable( str, nil , true )
-	
+
 	--Jvs: should never happen, but you never know with garry's baseclass stuff
-	
+
 	if not wepinfotab then
 		wepinfotab = {}
 	end
-	
+
 	setmetatable( wepinfotab, wepinfo_meta )
-	
+
 	self._WeaponInfo = wepinfotab
 	self.PrintName = self._WeaponInfo.printname
-	
+
 	self.DrawWeaponInfoBox = false
 	self.BounceWeaponIcon = false
-	
+
 	self.ScriptedEntityType = "cssweapon"
-	
+
 	self.Category = "Counter Strike: Source"
-	
+
 	self.CSMuzzleFlashes = true
-	
+
 	if self._WeaponInfo.MuzzleFlashStyle == "CS_MUZZLEFLASH_X" then
 		self.CSMuzzleX = true
 	end
-	
+
 	self.Primary.Automatic = tobool( tonumber( self._WeaponInfo.FullAuto ) )
 	self.Primary.ClipSize = self._WeaponInfo.clip_size
 	self.Primary.Ammo = self._WeaponInfo.primary_ammo
 	self.Primary.DefaultClip = 0
-	
+
 	self.Secondary.Automatic = false
 	self.Secondary.ClipSize = -1
 	self.Secondary.DefaultClip = 0
 	self.Secondary.Ammo = -1
-	
-		
+
+
 	--Jvs: if this viewmodel can't be converted into the corresponding c_ model, apply viewmodel flip as usual
 	local convertedvm = self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" )
-	
+
 	if file.Exists( convertedvm , "GAME" ) then
 		self.ViewModel = convertedvm
 	else
 		self.ViewModelFlip = self._WeaponInfo.BuiltRightHanded == 0
 	end
-	
+
 	self.WorldModel = self._WeaponInfo.playermodel
 	self.ViewModelFOV = 60
 	self.Weight = self._WeaponInfo.weight
@@ -332,13 +333,13 @@ end
 
 hook.Add( "SetupMove" , "CSS - Speed Modify" , function( ply , mv , cmd )
 	local weapon = ply:GetActiveWeapon()
-	
+
 	if IsValid( weapon ) and weapon.CSSWeapon then
 		mv:SetMaxClientSpeed( mv:GetMaxClientSpeed() * weapon:GetSpeedRatio() )
 	end
 end)
 
-if CLIENT then 
+if CLIENT then
 
 	hook.Add("Initialize","cssweapons",function()
 		local t = list.GetForEdit "Weapon"
@@ -382,7 +383,7 @@ if CLIENT then
 	f"UMP45"
 	f"USP45"
 	f"xm1014"
-	f"C4"	
+	f"C4"
 
 
 
@@ -394,12 +395,12 @@ if CLIENT then
 
 			local icon = vgui.Create( "SpawnIcon" )
 			icon:SetSize( 64, 64 )
-			
+
 			local wep = weapons.GetStored( obj.spawnname )
 			icon:SetModel( wep.WorldModel or "models/weapons/w_rif_ak47.mdl" )
-			
+
 			icon:SetTooltip( obj.nicename )
-			
+
 			icon.Label = icon:Add( "DLabel" )
 			icon.Label:Dock( BOTTOM )
 			icon.Label:SetContentAlignment( 2 )
@@ -407,7 +408,7 @@ if CLIENT then
 			icon.Label:SetTextColor( Color( 255, 255, 255, 255 ) )
 			icon.Label:SetExpensiveShadow( 1, Color( 0, 0, 0, 200 ) )
 			icon.Label:SetText(obj.nicename)
-			
+
 						icon.DoClick = function()
 
 													RunConsoleCommand( "gm_giveswep", obj.spawnname )

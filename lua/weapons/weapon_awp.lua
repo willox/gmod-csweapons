@@ -128,7 +128,6 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 
 SWEP.Spawnable = true
 
-
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
 	self:SetHoldType( "ar2" )
@@ -162,14 +161,12 @@ function SWEP:SecondaryAttack()
 		return
 	end
 
-	if (IsFirstTimePredicted()) then
-		if ( not self:IsScoped() ) then
-			self:SetFOVRatio( 40/90, 0.15 );
-		elseif (FloatEquals(self:GetFOVRatio(), 40/90)) then
-			self:SetFOVRatio( 10/90, 0.08 );
-		else
-			self:SetFOVRatio( 1, 0.1 );
-		end
+	if ( not self:IsScoped() ) then
+		self:SetFOVRatio( 40/90, 0.15 );
+	elseif (FloatEquals(self:GetFOVRatio(), 40/90)) then
+		self:SetFOVRatio( 10/90, 0.08 );
+	else
+		self:SetFOVRatio( 1, 0.1 );
 	end
 
 	-- If this isn't guarded, the sound will be emitted twice, once by the server and once by the client.

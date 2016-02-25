@@ -309,27 +309,30 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 
 		dir:Normalize()
 
+        ply:LagCompensation(true)
 
-		ply:FireBullets {
-			AmmoType = self.Primary.Ammo,
-			Distance = pCSInfo.Range,
-			Tracer = 1,
-			Attacker = ply,
-			Damage = iDamage,
-			Src = ply:GetShootPos(),
-			Dir = dir,
-			Spread = vector_origin,
-			Callback = function( hitent , trace , dmginfo )
-				--TODO: penetration
-				--unfortunately this can't be done with a static function or we'd need to set global variables for range and shit
+    		ply:FireBullets {
+    			AmmoType = self.Primary.Ammo,
+    			Distance = pCSInfo.Range,
+    			Tracer = 1,
+    			Attacker = ply,
+    			Damage = iDamage,
+    			Src = ply:GetShootPos(),
+    			Dir = dir,
+    			Spread = vector_origin,
+    			Callback = function( hitent , trace , dmginfo )
+    				--TODO: penetration
+    				--unfortunately this can't be done with a static function or we'd need to set global variables for range and shit
 
-				if flRangeModifier then
-					--Jvs: the damage modifier valve actually uses
-					local flCurrentDistance = trace.Fraction * pCSInfo.Range
-					dmginfo:SetDamage( dmginfo:GetDamage() * math.pow( flRangeModifier, ( flCurrentDistance / 500 ) ) )
-				end
-			end
-		}
+    				if flRangeModifier then
+    					--Jvs: the damage modifier valve actually uses
+    					local flCurrentDistance = trace.Fraction * pCSInfo.Range
+    					dmginfo:SetDamage( dmginfo:GetDamage() * math.pow( flRangeModifier, ( flCurrentDistance / 500 ) ) )
+    				end
+    			end
+    		}
+            
+        ply:LagCompensation(false)
 	end
 end
 

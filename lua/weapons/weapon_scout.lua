@@ -223,17 +223,16 @@ function SWEP:GunFire( spread )
 		spread = spread + .08
 	end
 
-	if (self:IsScoped()) then
-		self:SetLastZoom(self:GetTargetFOVRatio());
-
-		self:SetResumeZoom(true);
-		self:SetFOVRatio( 1, 0.1 );
-	end
-
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
 		return
 	end
+    
+    if (self:IsScoped()) then
+        self:SetLastZoom(self:GetTargetFOVRatio());
 
+        self:SetResumeZoom(true);
+        self:SetFOVRatio( 1, 0.1 );
+    end
 
 	local a = self:GetOwner():GetViewPunchAngles( )
 	a.p = a.p - 2

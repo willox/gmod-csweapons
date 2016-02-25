@@ -190,16 +190,6 @@ function SWEP:AdjustMouseSensitivity()
 	end
 end
 
-function SWEP:GetMaxSpeed()
-
-	if ( not self:IsScoped() ) then
-		return self:GetOwner().DefaultMaxSpeed -- TODO: not do this
-	else
-		-- Slower speed when zoomed in.
-		return 150
-	end
-end
-
 function SWEP:IsScoped()
 	return self:GetTargetFOVRatio() ~= 1
 end
@@ -235,17 +225,16 @@ function SWEP:GunFire( spread )
 		spread = spread + .08
 	end
 
+	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
+		return
+	end
+
 	if (self:IsScoped()) then
 		self:SetLastZoom(self:GetTargetFOVRatio());
 
 		self:SetResumeZoom(true);
 		self:SetFOVRatio( 1, 0.1 );
 	end
-
-	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
-		return
-	end
-
 
 	local a = self:GetOwner():GetViewPunchAngles( )
 	a.p = a.p - 2

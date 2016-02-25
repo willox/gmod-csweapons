@@ -1,67 +1,66 @@
 AddCSLuaFile()
-DEFINE_BASECLASS( "weapon_csbasegun" )
-
 local function FloatEquals(x,y)
 	return math.abs(x-y) < 1.19209290E-07
 end
 
---Jvs: I wish this weapon defining shit was this easy
-CSParseWeaponInfo( SWEP , [[WeaponData
+DEFINE_BASECLASS "weapon_csbasegun"
+
+CSParseWeaponInfo(SWEP, [[WeaponData
 {
-	"MaxPlayerSpeed"			"210"
+	"MaxPlayerSpeed" 		"260"
 	"WeaponType" 			"SniperRifle"
 	"FullAuto"				0
-	"WeaponPrice"			"4750"
-	"WeaponArmorRatio"		"1.95"
-	"CrosshairMinDistance"		"8"
+	"WeaponPrice"			"2750"
+	"WeaponArmorRatio"		"1.7"
+	"CrosshairMinDistance"		"5"
 	"CrosshairDeltaDistance"	"3"
 	"Team"				"ANY"
 	"BuiltRightHanded"		"0"
-	"PlayerAnimationExtension" 	"awp"
-	"MuzzleFlashScale"		"1.35"
+	"PlayerAnimationExtension"	"scout"
+	"MuzzleFlashScale"		"1.1"
 
 	"CanEquipWithShield"		"0"
 
 
 	// Weapon characteristics:
 	"Penetration"			"3"
-	"Damage"			"115"
+	"Damage"			"75"
 	"Range"				"8192"
-	"RangeModifier"			"0.99"
+	"RangeModifier"			"0.98"
 	"Bullets"			"1"
-	"CycleTime"			"1.5"	// 1.455
+	"CycleTime"			"1.25"
 	"AccuracyDivisor"		"-1"
 	"AccuracyOffset"		"0"
 	"MaxInaccuracy"			"0"
-	"TimeToIdle"			"2"
+	"TimeToIdle"			"1.8"
 	"IdleInterval"			"60"
 
 	// New accuracy model parameters
-	"Spread"					0.00020
-	"InaccuracyCrouch"			0.06060
-	"InaccuracyStand"			0.08080
-	"InaccuracyJump"			0.54600
-	"InaccuracyLand"			0.05460
-	"InaccuracyLadder"			0.13650
-	"InaccuracyFire"			0.14000
-	"InaccuracyMove"			0.27300
+	"Spread"					0.00030
+	"InaccuracyCrouch"			0.02378
+	"InaccuracyStand"			0.03170
+	"InaccuracyJump"			0.38195
+	"InaccuracyLand"			0.03819
+	"InaccuracyLadder"			0.09549
+	"InaccuracyFire"			0.06667
+	"InaccuracyMove"			0.19097
 
-	"SpreadAlt"					0.00020
-	"InaccuracyCrouchAlt"		0.00150
-	"InaccuracyStandAlt"		0.00200
-	"InaccuracyJumpAlt"			0.54600
-	"InaccuracyLandAlt"			0.05460
-	"InaccuracyLadderAlt"		0.13650
-	"InaccuracyFireAlt"			0.14000
-	"InaccuracyMoveAlt"			0.27300
+	"SpreadAlt"					0.00030
+	"InaccuracyCrouchAlt"		0.00300
+	"InaccuracyStandAlt"		0.00400
+	"InaccuracyJumpAlt"			0.38195
+	"InaccuracyLandAlt"			0.03819
+	"InaccuracyLadderAlt"		0.09549
+	"InaccuracyFireAlt"			0.06667
+	"InaccuracyMoveAlt"			0.19097
 
-	"RecoveryTimeCrouch"		0.24671
-	"RecoveryTimeStand"			0.34539
+	"RecoveryTimeCrouch"		0.17681
+	"RecoveryTimeStand"			0.24753
 
 	// Weapon data is loaded by both the Game and Client DLLs.
-	"printname"			"#Cstrike_WPNHUD_AWP"
-	"viewmodel"			"models/weapons/v_snip_awp.mdl"
-	"playermodel"			"models/weapons/w_snip_awp.mdl"
+	"printname"			"#Cstrike_WPNHUD_Scout"
+	"viewmodel"			"models/weapons/v_snip_scout.mdl"
+	"playermodel"			"models/weapons/w_snip_scout.mdl"
 
 	"anim_prefix"			"anim"
 	"bucket"			"0"
@@ -69,7 +68,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 
 	"clip_size"			"10"
 
-	"primary_ammo"			"BULLET_PLAYER_338MAG"
+	"primary_ammo"			"BULLET_PLAYER_762MM"
 	"secondary_ammo"		"None"
 
 	"weight"			"30"
@@ -80,7 +79,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	{
 		//"reload"			"Weapon_AWP.Reload"
 		//"empty"				"Default.ClipEmpty_Rifle"
-		"single_shot"		"Weapon_AWP.Single"
+		"single_shot"		"Weapon_Scout.Single"
 		special3			Default.Zoom
 	}
 
@@ -90,17 +89,17 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 		"weapon"
 		{
 				"font"		"CSweaponsSmall"
-				"character"	"R"
+				"character"	"N"
 		}
 		"weapon_s"
 		{
 				"font"		"CSweapons"
-				"character"	"R"
+				"character"	"N"
 		}
 		"ammo"
 		{
 				"font"		"CSTypeDeath"
-				"character"		"W"
+				"character"		"V"
 		}
 		"autoaim"
 		{
@@ -115,16 +114,17 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	{
 		Viewmodel
 		{
-			Mins	"-11 -3 -12"
-			Maxs	"32 10 0"
+			Mins	"-12 -4 -11"
+			Maxs	"27 12 -1"
 		}
 		World
 		{
-			Mins	"-12 -6 -15"
-			Maxs	"38 9 15"
+			Mins	"-10 -4 -13"
+			Maxs	"32 8 12"
 		}
 	}
-}]] )
+}]])
+
 
 SWEP.Spawnable = true
 
@@ -138,15 +138,13 @@ function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
 
 	if not self:GetOwner():OnGround() then
-		self:GunFire( .85 )
+		self:GunFire( .2 )
 	elseif self:GetOwner():GetAbsVelocity():Length2D() > 140 then
-		self:GunFire( .25 )
-	elseif self:GetOwner():GetAbsVelocity():Length2D() > 10 then
-		self:GunFire( .10 )
+		self:GunFire( .075 )
 	elseif self:GetOwner():Crouching() then
 		self:GunFire( 0 )
 	else
-		self:GunFire( .001 )
+		self:GunFire( .007 )
 	end
 end
 
@@ -203,7 +201,7 @@ end
 function SWEP:GetSpeedRatio()
 
 	if (self:IsScoped()) then
-		return 0.5
+		return 220/260
 	end
 
 	return 1
@@ -228,13 +226,13 @@ function SWEP:GunFire( spread )
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
 		return
 	end
+    
+    if (self:IsScoped()) then
+        self:SetLastZoom(self:GetTargetFOVRatio());
 
-	if (self:IsScoped()) then
-		self:SetLastZoom(self:GetTargetFOVRatio());
-
-		self:SetResumeZoom(true);
-		self:SetFOVRatio( 1, 0.1 );
-	end
+        self:SetResumeZoom(true);
+        self:SetFOVRatio( 1, 0.1 );
+    end
 
 	local a = self:GetOwner():GetViewPunchAngles( )
 	a.p = a.p - 2

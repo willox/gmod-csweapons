@@ -85,11 +85,10 @@ function ENT:StartTouch( otherent )
 end
 
 function ENT:Touch( otherent )
-	if otherent == self:GetThrower() then
-		return
-	end
-	
-	self:BounceSound()
+end
+
+function ENT:PhysicsCollide( data, phys )
+	if data.Speed > 22 then self:BounceSound() end
 end
 
 function ENT:BounceSound()

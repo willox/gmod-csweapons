@@ -210,7 +210,7 @@ game.AddAmmoType {
 
 --[[
 	load the keyvalues from a string and parses it
-	
+
 	NOTE:	this function should be called right after AddCSLuaFile() on the SWEP object
 			see ak47
 ]]
@@ -252,7 +252,7 @@ wepinfo_meta.__index = wepinfo_meta
 
 if CLIENT then
 	CS_KILLICON_FONT = "CSTypeDeath"
-	
+
 	surface.CreateFont( CS_KILLICON_FONT ,
 	{
 		font		= "csd",
@@ -260,53 +260,65 @@ if CLIENT then
 		antialias	= true,
 		weight		= 300
 	})
-	
+
 end
+
+local classlist = {}
 
 function CSParseWeaponInfo( self,  str )
 	local class = self.Folder:Replace( ".lua" , "" )
 	class = class:Replace( "weapons/" , "" )
+
+	classlist[class] = true
+
 	local wepinfotab = util.KeyValuesToTable( str, nil , true )
-	
+
 	--Jvs: should never happen, but you never know with garry's baseclass stuff
-	
+
 	if not wepinfotab then
 		wepinfotab = {}
 	end
-	
+
 	setmetatable( wepinfotab, wepinfo_meta )
-	
+
 	self._WeaponInfo = wepinfotab
 	self.PrintName = self._WeaponInfo.printname
-	
+
+	self.DrawWeaponInfoBox = false
+	self.BounceWeaponIcon = false
+
+	self.ScriptedEntityType = "cssweapon"
+
+	self.Category = "Counter Strike: Source"
+
 	self.CSMuzzleFlashes = true
-	
+
 	if self._WeaponInfo.MuzzleFlashStyle == "CS_MUZZLEFLASH_X" then
 		self.CSMuzzleX = true
 	end
-	
+
 	self.Primary.Automatic = tobool( tonumber( self._WeaponInfo.FullAuto ) )
 	self.Primary.ClipSize = self._WeaponInfo.clip_size
 	self.Primary.Ammo = self._WeaponInfo.primary_ammo
 	self.Primary.DefaultClip = 0
-	
+
 	self.Secondary.Automatic = false
 	self.Secondary.ClipSize = -1
 	self.Secondary.DefaultClip = 0
 	self.Secondary.Ammo = -1
-	
-		
+
+
 	--Jvs: if this viewmodel can't be converted into the corresponding c_ model, apply viewmodel flip as usual
 	local convertedvm = self._WeaponInfo.viewmodel:Replace( "/v_" , "/cstrike/c_" )
-	
+
 	if file.Exists( convertedvm , "GAME" ) then
 		self.ViewModel = convertedvm
 	else
 		self.ViewModelFlip = self._WeaponInfo.BuiltRightHanded == 0
 	end
-	
+
 	self.WorldModel = self._WeaponInfo.playermodel
-	self.ViewModelFOV = 45
+	self.ViewModelFOV = 60
 	self.Weight = self._WeaponInfo.weight
 	self.m_WeaponDeploySpeed = 1
 	if CLIENT then
@@ -321,8 +333,115 @@ end
 
 hook.Add( "SetupMove" , "CSS - Speed Modify" , function( ply , mv , cmd )
 	local weapon = ply:GetActiveWeapon()
-	
+
 	if IsValid( weapon ) and weapon.CSSWeapon then
 		mv:SetMaxClientSpeed( mv:GetMaxClientSpeed() * weapon:GetSpeedRatio() )
 	end
 end)
+
+if CLIENT then
+
+	hook.Add("Initialize","cssweapons",function()
+		local t = list.GetForEdit "Weapon"
+		for class,_ in next,classlist do
+			local data = t[class]
+			if data then
+				data.ScriptedEntityType = "cssweapon"
+			end
+		end
+	end)
+
+	local function f(t,u)
+		language.Add('Cstrike_WPNHUD_'..t,u or t)
+	end
+
+	f("AK47","AK-47")
+	f"Aug"
+	f"AWP"
+	f("DesertEagle","Desert Eagle")
+	f"Elites"
+	f"Famas"
+	f"FiveSeven"
+	f"Flashbang"
+	f"G3SG1"
+	f"Galil"
+	f("Glock18","Glock 18")
+	f("HE_Grenade","HE Grenade")
+	f"Knife"
+	f"M249"
+	f"m3"
+	f"M4A1"
+	f"MAC10"
+	f"MP5"
+	f"P228"
+	f"P90"
+	f"Scout"
+	f"SG550"
+	f"SG552"
+	f("Smoke_Grenade","Smoke grenade")
+	f"Tmp"
+	f"UMP45"
+	f"USP45"
+	f"xm1014"
+	f"C4"
+
+
+
+	spawnmenu.AddContentType( "cssweapon", function( container, obj )
+
+			if ( !obj.material ) then return end
+			if ( !obj.nicename ) then return end
+			if ( !obj.spawnname ) then return end
+
+			local icon = vgui.Create( "SpawnIcon" )
+			icon:SetSize( 64, 64 )
+
+			local wep = weapons.GetStored( obj.spawnname )
+			icon:SetModel( wep.WorldModel or "models/weapons/w_rif_ak47.mdl" )
+
+			icon:SetTooltip( obj.nicename )
+
+			icon.Label = icon:Add( "DLabel" )
+			icon.Label:Dock( BOTTOM )
+			icon.Label:SetContentAlignment( 2 )
+			icon.Label:DockMargin( 4, 0, 4, 10 )
+			icon.Label:SetTextColor( Color( 255, 255, 255, 255 ) )
+			icon.Label:SetExpensiveShadow( 1, Color( 0, 0, 0, 200 ) )
+			icon.Label:SetText(obj.nicename)
+
+						icon.DoClick = function()
+
+													RunConsoleCommand( "gm_giveswep", obj.spawnname )
+													surface.PlaySound( "ui/buttonclickrelease.wav" )
+
+											end
+
+					icon.DoMiddleClick = function()
+
+													RunConsoleCommand( "gm_spawnswep", obj.spawnname )
+													surface.PlaySound( "ui/buttonclickrelease.wav" )
+
+											end
+
+
+					icon.OpenMenu = function( icon )
+
+													local menu = DermaMenu()
+															menu:AddOption( "Copy to Clipboard", function() SetClipboardText( obj.spawnname ) end )
+															menu:AddOption( "Spawn Using Toolgun", function() RunConsoleCommand( "gmod_tool", "creator" ) RunConsoleCommand( "creator_type", "3" ) RunConsoleCommand( "creator_name", obj.spawnname ) end )
+															menu:AddSpacer()
+															menu:AddOption( "Delete", function() icon:Remove() hook.Run( "SpawnlistContentChanged", icon ) end )
+													menu:Open()
+
+													end
+
+
+			if ( IsValid( container ) ) then
+					container:Add( icon )
+			end
+
+			return icon
+
+	end )
+
+end

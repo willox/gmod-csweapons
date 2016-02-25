@@ -27,8 +27,8 @@ function SWEP:Deploy()
 	if SERVER then
 		if IsValid( self:GetOwner() ) then
 			if self:GetOwner():GetAmmoCount( self:GetPrimaryAmmoType() ) <= 0 then
-				self:GetOwner():DropWeapon( self )
-				self:Remove()
+				self:GetOwner():StripWeapon( self.ClassName )
+				SafeRemoveEntityDelayed( self ,0.1 )
 				return false
 			end
 		end
@@ -44,8 +44,8 @@ function SWEP:Holster()
 	if SERVER then
 		if IsValid( self:GetOwner() ) then
 			if self:GetOwner():GetAmmoCount( self:GetPrimaryAmmoType() ) <= 0 then
-				self:GetOwner():DropWeapon( self )
-				self:Remove()
+				self:GetOwner():StripWeapon( self.ClassName )
+				SafeRemoveEntityDelayed( self ,0.1 )
 				return false
 			end
 		end
@@ -114,8 +114,8 @@ function SWEP:Think()
 	elseif self:GetRedraw() then
 		if self:GetOwner():GetAmmoCount( self:GetPrimaryAmmoType() ) <= 0 then
 			if SERVER then
-				self:GetOwner():DropWeapon( self )
-				self:Remove()
+				self:GetOwner():StripWeapon( self.ClassName )
+				SafeRemoveEntityDelayed( self ,0.1 )
 			end
 			return
 		else

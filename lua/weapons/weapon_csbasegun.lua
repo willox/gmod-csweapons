@@ -428,7 +428,6 @@ function SWEP:PenetrateBullet(dir, vecStart, flDistance, iPenetration, iDamage,
 
             local flPenetrationModifier, flDamageModifier = unpack(PenetrationValues[trace.MatType] or PenetrationValues[MAT_DEFAULT])
 
-            print(flPenetrationModifier, flDamageModifier)
             flCurrentDistance = flCurrentDistance + trace.Fraction * (trace.HitPos - vecStart):Length()
             iDamage = iDamage * flRangeModifier ^ (flCurrentDistance / 500)
 

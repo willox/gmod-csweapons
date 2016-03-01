@@ -309,16 +309,12 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 
 		dir:Normalize()
 
-        ply:LagCompensation(true)
+        local flDistance = self:GetWeaponInfo().Range
+        local iPenetration = self:GetWeaponInfo().Penetration
+        local flRangeModifier = self:GetWeaponInfo().RangeModifier
 
-            local flDistance = self:GetWeaponInfo().Range
-            local iPenetration = self:GetWeaponInfo().Penetration
-            local flRangeModifier = self:GetWeaponInfo().RangeModifier
+        self:PenetrateBullet(dir, ply:GetShootPos(), flDistance, iPenetration, iDamage, flRangeModifier, self:GetPenetrationFromBullet())
 
-            self:PenetrateBullet(dir, ply:GetShootPos(), flDistance, iPenetration, iDamage, flRangeModifier, self:GetPenetrationFromBullet())
-
-
-        ply:LagCompensation(false)
 	end
 end
 
@@ -428,7 +424,6 @@ function SWEP:PenetrateBullet(dir, vecStart, flDistance, iPenetration, iDamage,
 
             local flPenetrationModifier, flDamageModifier = unpack(PenetrationValues[trace.MatType] or PenetrationValues[MAT_DEFAULT])
 
-            print(flPenetrationModifier, flDamageModifier)
             flCurrentDistance = flCurrentDistance + trace.Fraction * (trace.HitPos - vecStart):Length()
             iDamage = iDamage * flRangeModifier ^ (flCurrentDistance / 500)
 

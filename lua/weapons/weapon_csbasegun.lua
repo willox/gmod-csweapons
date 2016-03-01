@@ -309,16 +309,12 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 
 		dir:Normalize()
 
-        ply:LagCompensation(true)
+        local flDistance = self:GetWeaponInfo().Range
+        local iPenetration = self:GetWeaponInfo().Penetration
+        local flRangeModifier = self:GetWeaponInfo().RangeModifier
 
-            local flDistance = self:GetWeaponInfo().Range
-            local iPenetration = self:GetWeaponInfo().Penetration
-            local flRangeModifier = self:GetWeaponInfo().RangeModifier
+        self:PenetrateBullet(dir, ply:GetShootPos(), flDistance, iPenetration, iDamage, flRangeModifier, self:GetPenetrationFromBullet())
 
-            self:PenetrateBullet(dir, ply:GetShootPos(), flDistance, iPenetration, iDamage, flRangeModifier, self:GetPenetrationFromBullet())
-
-
-        ply:LagCompensation(false)
 	end
 end
 

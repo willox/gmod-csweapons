@@ -137,15 +137,7 @@ end
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
 
-	if not self:GetOwner():OnGround() then
-		self:GunFire( .2 )
-	elseif self:GetOwner():GetAbsVelocity():Length2D() > 140 then
-		self:GunFire( .075 )
-	elseif self:GetOwner():Crouching() then
-		self:GunFire( 0 )
-	else
-		self:GunFire( .007 )
-	end
+	self:GunFire(self:BuildSpread())
 end
 
 function SWEP:SecondaryAttack()
@@ -226,13 +218,13 @@ function SWEP:GunFire( spread )
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
 		return
 	end
-    
-    if (self:IsScoped()) then
-        self:SetLastZoom(self:GetTargetFOVRatio());
 
-        self:SetResumeZoom(true);
-        self:SetFOVRatio( 1, 0.1 );
-    end
+	if (self:IsScoped()) then
+		self:SetLastZoom(self:GetTargetFOVRatio());
+
+		self:SetResumeZoom(true);
+		self:SetFOVRatio( 1, 0.1 );
+	end
 
 	local a = self:GetOwner():GetViewPunchAngles( )
 	a.p = a.p - 2

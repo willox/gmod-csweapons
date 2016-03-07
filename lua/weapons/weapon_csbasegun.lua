@@ -53,7 +53,7 @@ function SWEP:Deploy()
 	self:SetStoredFOVRatio(1)
 	self:SetTargetFOVStartTime(0)
 	self:SetTargetFOVTime(0)
-    self:SetResumeZoom(false)
+	self:SetResumeZoom(false)
 
 	return BaseClass.Deploy( self )
 end
@@ -309,18 +309,62 @@ function SWEP:FireCSSBullet( ang , primarymode , spread )
 
 		dir:Normalize()
 
-        local flDistance = self:GetWeaponInfo().Range
-        local iPenetration = self:GetWeaponInfo().Penetration
-        local flRangeModifier = self:GetWeaponInfo().RangeModifier
+		local flDistance = self:GetWeaponInfo().Range
+		local iPenetration = self:GetWeaponInfo().Penetration
+		local flRangeModifier = self:GetWeaponInfo().RangeModifier
 
-        self:PenetrateBullet(dir, ply:GetShootPos(), flDistance, iPenetration, iDamage, flRangeModifier, self:GetPenetrationFromBullet())
+		self:PenetrateBullet(dir, ply:GetShootPos(), flDistance, iPenetration, iDamage, flRangeModifier, self:GetPenetrationFromBullet())
 
 	end
 end
 
+function SWEP:BuildSpread()
+	local pCSInfo = self:GetWeaponInfo()
+	local pPlayer = self:GetOwner()
+	local spread
+	if (not self:IsScoped() and not self:GetBurstFireEnabled() and not self:IsSilenced()) then
+		spread = pCSInfo.Spread +  (
+			pPlayer:Crouching() and pCSInfo.InaccuracyCrouch or
+			pCSInfo.InaccuracyStand
+		)
+		if (pPlayer:GetMoveType() == MOVETYPE_LADDER) then
+			spread = spread + pCSInfo.InaccuracyLadder
+		end
+		if (pPlayer:GetAbsVelocity():Length2D() > 5) then
+			spread = spread + pCSInfo.InaccuracyMove
+		end
+		if (pPlayer:IsOnFire()) then
+			spread = spread + pCSInfo.InaccuracyFire
+		end
+		if (not pPlayer:IsOnGround()) then
+			spread = spread + pCSInfo.InaccuracyJump
+		end
+
+	else
+		spread = pCSInfo.SpreadAlt +  (
+			pPlayer:Crouching() and pCSInfo.InaccuracyCrouchAlt or
+			not pPlayer:IsOnGround() and pCSInfo.InaccuracyJumpAlt or
+			pCSInfo.InaccuracyStandAlt
+		)
+		if (pPlayer:GetMoveType() == MOVETYPE_LADDER) then
+			spread = spread + pCSInfo.InaccuracyLadderAlt
+		end
+		if (pPlayer:GetAbsVelocity():Length2D() > 5) then
+			spread = spread + pCSInfo.InaccuracyMoveAlt
+		end
+		if (pPlayer:IsOnFire()) then
+			spread = spread + pCSInfo.InaccuracyFireAlt
+		end
+		if (not pPlayer:IsOnGround()) then
+			spread = spread + pCSInfo.InaccuracyJumpAlt
+		end
+	end
+	return spread * (1 - self:GetAccuracy())
+end
+
 function SWEP:GetPenetrationFromBullet()
-    local iBulletType = self.Primary.Ammo
-    local fPenetrationPower, flPenetrationDistance
+	local iBulletType = self.Primary.Ammo
+	local fPenetrationPower, flPenetrationDistance
 
 	if iBulletType == "BULLET_PLAYER_50AE" then
 		fPenetrationPower = 30;
@@ -328,8 +372,8 @@ function SWEP:GetPenetrationFromBullet()
 	elseif iBulletType == "BULLET_PLAYER_762MM" then
 		fPenetrationPower = 39;
 		flPenetrationDistance = 5000.0;
-    elseif iBulletType == "BULLET_PLAYER_556MM" or
-        iBulletType == "BULLET_PLAYER_556MM_BOX" then
+	elseif iBulletType == "BULLET_PLAYER_556MM" or
+		iBulletType == "BULLET_PLAYER_556MM_BOX" then
 		fPenetrationPower = 35;
 		flPenetrationDistance = 4000.0;
 	elseif iBulletType == "BULLET_PLAYER_338MAG" then
@@ -356,26 +400,26 @@ function SWEP:GetPenetrationFromBullet()
 		flPenetrationDistance = 0.0;
 	end
 
-    return fPenetrationPower, flPenetrationDistance
+	return fPenetrationPower, flPenetrationDistance
 
 end
 
 function SWEP:TraceToExit(start, dir, endpos, stepsize, maxdistance)
 
-    local flDistance = 0
-    local last = start
+	local flDistance = 0
+	local last = start
 
-    while (flDistance < maxdistance) do
-        flDistance = flDistance + stepsize
+	while (flDistance < maxdistance) do
+		flDistance = flDistance + stepsize
 
-        endpos:Set(start + flDistance *dir)
+		endpos:Set(start + flDistance *dir)
 
-        if bit.band(util.PointContents(endpos), MASK_SOLID) == 0 then
-            return true, endpos
-        end
-    end
+		if bit.band(util.PointContents(endpos), MASK_SOLID) == 0 then
+			return true, endpos
+		end
+	end
 
-    return false
+	return false
 
 end
 
@@ -383,9 +427,9 @@ end
 local PenetrationValues = {}
 
 local function set(values, ...)
-    for i = 1, select("#", ...) do
-        PenetrationValues[select(i, ...)] = values
-    end
+	for i = 1, select("#", ...) do
+		PenetrationValues[select(i, ...)] = values
+	end
 end
 -- flPenetrationModifier, flDamageModifier
 -- flDamageModifier should always be less than flPenetrationModifier
@@ -395,9 +439,24 @@ set({0.5, 0.45}, MAT_FLESH, MAT_ALIENFLESH, MAT_ANTLION, MAT_BLOODYFLESH, MAT_SL
 set({1, 0.99},   MAT_GRATE)
 set({0.5, 0.45}, MAT_DEFAULT)
 
+function SWEP:ImpactTrace(tr)
+	local e = EffectData()
+	e:SetOrigin(tr.HitPos)
+	e:SetStart(tr.StartPos)
+	e:SetSurfaceProp(tr.SurfaceProps)
+	e:SetDamageType(DMG_BULLET)
+	e:SetHitBox(0)
+	if CLIENT then
+		e:SetEntity(game.GetWorld())
+	else
+		e:SetEntIndex(0)
+	end
+	util.Effect("Impact", e)
+end
+
 function SWEP:PenetrateBullet(dir, vecStart, flDistance, iPenetration, iDamage,
-    flRangeModifier, fPenetrationPower, flPenetrationDistance, flCurrentDistance)
-    flCurrentDistance = flCurrentDistance or 0
+	flRangeModifier, fPenetrationPower, flPenetrationDistance, flCurrentDistance)
+	flCurrentDistance = flCurrentDistance or 0
 	self:GetOwner():FireBullets {
 		AmmoType = self.Primary.Ammo,
 		Distance = flDistance,
@@ -417,78 +476,76 @@ function SWEP:PenetrateBullet(dir, vecStart, flDistance, iPenetration, iDamage,
 				dmginfo:SetDamage( dmginfo:GetDamage() * math.pow( flRangeModifier, ( flCurrentDistance / 500 ) ) )
 			end
 
-            if (trace.Fraction == 1) then
-                return
-            end
-            -- TODO: convert this to physprops? there doesn't seem to be a way to get penetration from those
+			if (trace.Fraction == 1) then
+				return
+			end
+			-- TODO: convert this to physprops? there doesn't seem to be a way to get penetration from those
 
-            local flPenetrationModifier, flDamageModifier = unpack(PenetrationValues[trace.MatType] or PenetrationValues[MAT_DEFAULT])
+			local flPenetrationModifier, flDamageModifier = unpack(PenetrationValues[trace.MatType] or PenetrationValues[MAT_DEFAULT])
 
-            flCurrentDistance = flCurrentDistance + trace.Fraction * (trace.HitPos - vecStart):Length()
-            iDamage = iDamage * flRangeModifier ^ (flCurrentDistance / 500)
+			flCurrentDistance = flCurrentDistance + trace.Fraction * (trace.HitPos - vecStart):Length()
+			iDamage = iDamage * flRangeModifier ^ (flCurrentDistance / 500)
 
-            if (flCurrentDistance > flPenetrationDistance && iPenetration > 0) then
-		        iPenetration = 0;
-            end
+			if (flCurrentDistance > flPenetrationDistance && iPenetration > 0) then
+				iPenetration = 0;
+			end
 
-            if iPenetration == 0 and not trace.MatType == MAT_GRATE then
-                return
-            end
+			if iPenetration == 0 and not trace.MatType == MAT_GRATE then
+				return
+			end
 
-            if iPenetration < 0 then
-                return
-            end
+			if iPenetration < 0 then
+				return
+			end
 
-            local penetrationEnd = Vector()
+			local penetrationEnd = Vector()
 
-            if not self:TraceToExit(trace.HitPos, dir, penetrationEnd, 24, 128) then
-                return
-            end
+			if not self:TraceToExit(trace.HitPos, dir, penetrationEnd, 24, 128) then
+				return
+			end
 
-            local hitent_already = false
-            local tr = util.TraceLine{
-                start = penetrationEnd,
-                endpos = trace.HitPos,
-                mask = MASK_SHOT,
-                filter = function(e)
-                    local ret = e:IsPlayer()
-                    if (ret and not hitent_already) then
-                        hitent_already = true
-                        return false
-                    end
-                    return true
-                end
-            }
+			local hitent_already = false
+			local tr = util.TraceLine{
+				start = penetrationEnd,
+				endpos = trace.HitPos,
+				mask = MASK_SHOT,
+				filter = function(e)
+					local ret = e:IsPlayer()
+					if (ret and not hitent_already) then
+						hitent_already = true
+						return false
+					end
+					return true
+				end
+			}
 
-            bHitGrate = tr.MatType == MAT_GRATE and bHitGrate
+			bHitGrate = tr.MatType == MAT_GRATE and bHitGrate
 
-            local iExitMaterial = tr.MatType
+			local iExitMaterial = tr.MatType
 
-            if (iExitMaterial == trace.MatType) then
-                if (iExitMaterial == MAT_WOOD or iExitMaterial == MAT_METAL) then
-                    flPenetrationModifier = flPenetrationModifier * 2
-                end
-            end
+			if (iExitMaterial == trace.MatType) then
+				if (iExitMaterial == MAT_WOOD or iExitMaterial == MAT_METAL) then
+					flPenetrationModifier = flPenetrationModifier * 2
+				end
+			end
 
-            local flTraceDistance = (tr.HitPos - trace.HitPos):Length()
+			local flTraceDistance = tr.HitPos:Distance(trace.HitPos)
 
-            if (flTraceDistance > (fPenetrationPower * flPenetrationModifier)) then
-                return
-            end
-            if CLIENT then
-                --self:GetOwner():ImpactTrace(tr, bit.bor(DMG_BULLET, DMG_NEVERGIB))
-            end
-            fPenetrationPower = fPenetrationPower - flTraceDistance / flPenetrationModifier
-            flCurrentDistance = flCurrentDistance + flTraceDistance
+			if (flTraceDistance > (fPenetrationPower * flPenetrationModifier)) then
+				return
+			end
+			self:ImpactTrace(tr)
+			fPenetrationPower = fPenetrationPower - flTraceDistance / flPenetrationModifier
+			flCurrentDistance = flCurrentDistance + flTraceDistance
 
-            vecStart = tr.HitPos
-            flDistance = (flDistance - flCurrentDistance) * .5
+			vecStart = tr.HitPos
+			flDistance = (flDistance - flCurrentDistance) * .5
 
-            iDamage = iDamage * flDamageModifier
+			iDamage = iDamage * flDamageModifier
 
-            iPenetration = iPenetration - 1
+			iPenetration = iPenetration - 1
 
-            self:PenetrateBullet(dir, vecStart, flDistance, iPenetration, iDamage, flRangeModifier, fPenetrationPower, flPenetrationDistance, flCurrentDistance)
+			self:PenetrateBullet(dir, vecStart, flDistance, iPenetration, iDamage, flRangeModifier, fPenetrationPower, flPenetrationDistance, flCurrentDistance)
 
 		end
 	}

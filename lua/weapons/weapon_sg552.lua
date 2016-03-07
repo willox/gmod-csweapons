@@ -144,15 +144,7 @@ end
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
 
-	--Jvs: valve sure is good at pulling values out of their ass
-
-	if not self:GetOwner():OnGround() then
-		self:GunFire( 0.035 + 0.45 * self:GetAccuracy() )
-	elseif self:GetOwner():GetAbsVelocity():Length2D() > 140 then
-		self:GunFire( 0.035 + 0.075 * self:GetAccuracy() )
-	else
-		self:GunFire( 0.02 * self:GetAccuracy() )
-	end
+	self:GunFire(self:BuildSpread())
 end
 
 function SWEP:SecondaryAttack()
@@ -171,7 +163,7 @@ function SWEP:SecondaryAttack()
 	elseif (FloatEquals(self:GetFOVRatio(), 55/90)) then
 		self:SetFOVRatio( 1, 0.08 );
 	else
-        --FIXME: This seems wrong
+		--FIXME: This seems wrong
 		self:SetFOVRatio( 1, 0);
 	end
 
@@ -181,7 +173,7 @@ function SWEP:SecondaryAttack()
 end
 
 function SWEP:IsScoped()
-    return self:GetFOVRatio() ~= 1
+	return self:GetFOVRatio() ~= 1
 end
 
 function SWEP:HandleReload()
@@ -190,11 +182,11 @@ end
 
 function SWEP:GunFire( spread )
 
-    local flCycleTime = self:GetWeaponInfo().CycleTime
+	local flCycleTime = self:GetWeaponInfo().CycleTime
 
-    if self:IsScoped() then
-        flCycleTime = 0.135
-    end
+	if self:IsScoped() then
+		flCycleTime = 0.135
+	end
 
 	if not self:BaseGunFire( spread, flCycleTime, true ) then
 		return

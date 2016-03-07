@@ -14,10 +14,10 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"BuiltRightHanded" 		"0"
 	"PlayerAnimationExtension" 	"pistol"
 	"MuzzleFlashScale"		"1"
-	
+
 	"CanEquipWithShield" 		"1"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"1"
 	"Damage"			"34"
@@ -25,7 +25,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"RangeModifier"			"0.79"
 	"Bullets"			"1"
 	"CycleTime"			"0.15"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00400
 	"InaccuracyCrouch"			0.00600
@@ -35,7 +35,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.01915
 	"InaccuracyFire"			0.03495
 	"InaccuracyMove"			0.01724
-								
+
 	"SpreadAlt"					0.00300
 	"InaccuracyCrouchAlt"		0.00600
 	"InaccuracyStandAlt"		0.00800
@@ -44,22 +44,22 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadderAlt"		0.01975
 	"InaccuracyFireAlt"			0.02504
 	"InaccuracyMoveAlt"			0.01778
-								 
+
 	"RecoveryTimeCrouch"		0.23371
 	"RecoveryTimeStand"			0.28045
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_USP45"
 	"viewmodel"			"models/weapons/v_pist_usp.mdl"
 	"playermodel"			"models/weapons/w_pist_usp.mdl"
-	"shieldviewmodel"		"models/weapons/v_shield_usp_r.mdl"	
+	"shieldviewmodel"		"models/weapons/v_shield_usp_r.mdl"
 	"SilencerModel"			"models/weapons/w_pist_usp_silencer.mdl"
 	"anim_prefix"			"anim"
 	"bucket"			"1"
 	"bucket_position"		"1"
 
 	"clip_size"			"12"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_45ACP"
 	"secondary_ammo"		"None"
 
@@ -86,7 +86,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"A"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"A"
 		}
@@ -143,48 +143,27 @@ function SWEP:Initialize()
 end
 
 function SWEP:Deploy()
-	
+
 	self:SetAccuracy( 0.92 )
 	self:SetDoneSwitchingSilencer( 0 )
 	return BaseClass.Deploy( self )
 end
 
 function SWEP:Holster()
-	
+
 	if self:GetDoneSwitchingSilencer() > 0 and self:GetDoneSwitchingSilencer() > CurTime() then
 		self:SetHasSilencer( false )
 	end
-	
+
 	self:UpdateWorldModel()
-	
+
 	return BaseClass.Holster( self )
 end
 
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
-	if self:IsSilenced() then
-		if not self:GetOwner():OnGround() then
-			self:GunFire( 1.3 * ( 1- self:GetAccuracy()), false )
-		elseif self:GetOwner():GetAbsVelocity():Length2D() > 5 then
-			self:GunFire( 0.25 * ( 1- self:GetAccuracy()), false )
-		elseif self:GetOwner():Crouching() then
-			self:GunFire( 0.125 * ( 1- self:GetAccuracy()), false )
-		else
-			self:GunFire( 0.15 * ( 1- self:GetAccuracy()), false )
-		end
-		
-	else
-		if not self:GetOwner():OnGround() then
-			self:GunFire( 1.2 * ( 1- self:GetAccuracy()), true )
-		elseif self:GetOwner():GetAbsVelocity():Length2D() > 5 then
-			self:GunFire( 0.225 * ( 1- self:GetAccuracy()), true )
-		elseif self:GetOwner():Crouching() then
-			self:GunFire( 0.08 * ( 1- self:GetAccuracy()), true )
-		else
-			self:GunFire( 0.1 * ( 1- self:GetAccuracy()), true )
-		end
-	end
+
+	self:GunFire(self:BuildSpread())
 end
 
 function SWEP:TranslateViewModelActivity( act )
@@ -206,10 +185,10 @@ function SWEP:UpdateWorldModel()
 end
 
 function SWEP:GunFire( spread , mode )
-	
+
 	--Jvs: technically this should be > 1, but since this is increased in basegunfire, we have to do it this way
 	if self:GetShotsFired() > 0 then return end
-	
+
 	self:SetAccuracy( self:GetAccuracy() - 0.275 * ( 0.3 - CurTime() - self:GetLastFire() ) )
 
 	if self:GetAccuracy() > 0.92 then
@@ -217,12 +196,12 @@ function SWEP:GunFire( spread , mode )
 	elseif self:GetAccuracy() < 0.6 then
 		self:SetAccuracy( 0.6 )
 	end
-	
+
 	self:SetNextIdle( CurTime() + 2 )
-	
+
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, mode ) then return end
-	
-	
+
+
 
 	local angle = self:GetOwner():GetViewPunchAngles()
 	angle.p = angle.p - 2
@@ -231,15 +210,15 @@ end
 
 function SWEP:SecondaryAttack()
 	if self:GetNextSecondaryAttack() > CurTime() then return end
-	
+
 	if self:GetHasSilencer() then
 		self:SendWeaponAnim( ACT_VM_DETACH_SILENCER )
 	else
 		self:SendWeaponAnim( ACT_VM_ATTACH_SILENCER )
 	end
-	
+
 	self:GetOwner():DoReloadEvent()
-	
+
 	self:SetHasSilencer( not self:GetHasSilencer() )
 	self:SetDoneSwitchingSilencer( CurTime() + 3 )
 	self:SetNextSecondaryAttack( CurTime() + 3 )

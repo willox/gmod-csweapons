@@ -137,17 +137,7 @@ end
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
 
-	if not self:GetOwner():OnGround() then
-		self:GunFire( .85 )
-	elseif self:GetOwner():GetAbsVelocity():Length2D() > 140 then
-		self:GunFire( .25 )
-	elseif self:GetOwner():GetAbsVelocity():Length2D() > 10 then
-		self:GunFire( .10 )
-	elseif self:GetOwner():Crouching() then
-		self:GunFire( 0 )
-	else
-		self:GunFire( .001 )
-	end
+	self:GunFire(self:BuildSpread())
 end
 
 function SWEP:SecondaryAttack()

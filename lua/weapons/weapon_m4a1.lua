@@ -3,7 +3,7 @@ DEFINE_BASECLASS( "weapon_csbasegun" )
 
 CSParseWeaponInfo( SWEP , [[WeaponData
 {
-	"MaxPlayerSpeed" 		"230" 
+	"MaxPlayerSpeed" 		"230"
 	"WeaponType" 			"Rifle"
 	"FullAuto"				1
 	"WeaponPrice" 			"3100"
@@ -14,10 +14,10 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"BuiltRightHanded" 		"0"
 	"PlayerAnimationExtension" 	"m4"
 	"MuzzleFlashScale"		"1.6"
-	
+
 	"CanEquipWithShield"		"0"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"2"
 	"Damage"			"33"
@@ -30,7 +30,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MaxInaccuracy"			"1.0"
 	"TimeToIdle"			"1.5"
 	"IdleInterval"			"60"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00060
 	"InaccuracyCrouch"			0.00525
@@ -40,7 +40,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.08538
 	"InaccuracyFire"			0.01266
 	"InaccuracyMove"			0.06872
-								 
+
 	"SpreadAlt"					0.00054
 	"InaccuracyCrouchAlt"		0.00525
 	"InaccuracyStandAlt"		0.00700
@@ -49,22 +49,22 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadderAlt"		0.08712
 	"InaccuracyFireAlt"			0.01165
 	"InaccuracyMoveAlt"			0.07039
-								 
+
 	"RecoveryTimeCrouch"		0.26973
 	"RecoveryTimeStand"			0.37762
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_M4A1"
 	"viewmodel"			"models/weapons/v_rif_m4a1.mdl"
 	"playermodel"			"models/weapons/w_rif_m4a1.mdl"
 	"SilencerModel"			"models/weapons/w_rif_m4a1_silencer.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"0"
 	"bucket_position"		"0"
 
 	"clip_size"			"30"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_556MM"
 	"secondary_ammo"		"None"
 
@@ -91,7 +91,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"W"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"W"
 		}
@@ -160,29 +160,17 @@ end
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
 	
-	--Jvs: valve sure is good at pulling values out of their ass
-	
-	if not self:GetOwner():OnGround() then
-		self:GunFire( 0.35 + 0.4 * self:GetAccuracy() )
-	elseif self:GetOwner():GetAbsVelocity():Length2D() > 140 then
-		self:GunFire( 0.35 + 0.07 * self:GetAccuracy() )
-	else
-		if self:IsSilenced() then
-			self:GunFire( 0.025 * self:GetAccuracy() )
-		else
-			self:GunFire( 0.02 * self:GetAccuracy() )
-		end
-	end
+	self:GunFire(self:BuildSpread())
 end
 
 function SWEP:GunFire( spread )
-	
+
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, not self:IsSilenced() ) then
 		return
 	end
-	
+
 	--Jvs: this is so goddamn lame
-	
+
 	if self:GetOwner():GetAbsVelocity():Length2D() > 5 then
 		self:KickBack( 1, 0.45, 0.28 , 0.045 , 3.75 , 3 , 7 )
 	elseif not self:GetOwner():OnGround() then
@@ -196,15 +184,15 @@ end
 
 function SWEP:SecondaryAttack()
 	if self:GetNextSecondaryAttack() > CurTime() then return end
-	
+
 	if self:GetHasSilencer() then
 		self:SendWeaponAnim( ACT_VM_DETACH_SILENCER )
 	else
 		self:SendWeaponAnim( ACT_VM_ATTACH_SILENCER )
 	end
-	
+
 	self:GetOwner():DoReloadEvent()
-	
+
 	self:SetHasSilencer( not self:GetHasSilencer() )
 	self:SetDoneSwitchingSilencer( CurTime() + 2 )
 	self:SetNextSecondaryAttack( CurTime() + 2 )
@@ -231,12 +219,12 @@ function SWEP:UpdateWorldModel()
 end
 
 function SWEP:Holster()
-	
+
 	if self:GetDoneSwitchingSilencer() > 0 and self:GetDoneSwitchingSilencer() > CurTime() then
 		self:SetHasSilencer( false )
 	end
-	
+
 	self:UpdateWorldModel()
-	
+
 	return BaseClass.Holster( self )
 end

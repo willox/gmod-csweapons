@@ -14,10 +14,10 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"BuiltRightHanded"		"0"
 	"PlayerAnimationExtension"	"pistol"
 	"MuzzleFlashScale"		"1.2"
-	
+
 	"CanEquipWithShield"		"1"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"2"
 	"Damage"			"54"
@@ -25,7 +25,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"RangeModifier"			"0.81"
 	"Bullets"			"1"
 	"CycleTime"			"0.225"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00400
 	"InaccuracyCrouch"			0.00975
@@ -38,24 +38,24 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 
 	"RecoveryTimeCrouch"		0.32236
 	"RecoveryTimeStand"			0.38683
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_DesertEagle"
 	"viewmodel"			"models/weapons/v_pist_deagle.mdl"
 	"playermodel"			"models/weapons/w_pist_deagle.mdl"
-	"shieldviewmodel"		"models/weapons/v_shield_de_r.mdl"	
+	"shieldviewmodel"		"models/weapons/v_shield_de_r.mdl"
 	"anim_prefix"			"anim"
 	"bucket"			"1"
 	"bucket_position"		"1"
 
 	"clip_size"			"7"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_50AE"
 	"secondary_ammo"		"None"
 
 	"weight"			"7"
 	"item_flags"			"0"
-	
+
 	// Sounds for the weapon. There is a max of 16 sounds per category (i.e. max 16 "single_shot" sounds)
 	SoundData
 	{
@@ -73,7 +73,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"F"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"F"
 		}
@@ -123,25 +123,17 @@ function SWEP:Initialize()
 end
 
 function SWEP:Deploy()
-	
+
 	self:SetAccuracy( 0.9 )
-	
+
 	return BaseClass.Deploy( self )
 end
 
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
-	if not self:GetOwner():OnGround() then
-		self:GunFire( 1.5 * ( 1- self:GetAccuracy()), true )
-	elseif self:GetOwner():GetAbsVelocity():Length2D() > 5 then
-		self:GunFire( 0.25 * ( 1- self:GetAccuracy()), true )
-	elseif self:GetOwner():Crouching() then
-		self:GunFire( 0.115 * ( 1- self:GetAccuracy()), true )
-	else
-		self:GunFire( 0.13 * ( 1- self:GetAccuracy()), true )
-	end
-	
+
+	self:GunFire(self:BuildSpread(), true )
+
 end
 
 function SWEP:TranslateViewModelActivity( act )
@@ -153,7 +145,7 @@ function SWEP:TranslateViewModelActivity( act )
 end
 
 function SWEP:GunFire( spread , mode )
-	
+
 	self:SetAccuracy( self:GetAccuracy() - 0.35 * ( 0.4 - CurTime() - self:GetLastFire() ) )
 
 	if self:GetAccuracy() > 0.9 then
@@ -161,15 +153,15 @@ function SWEP:GunFire( spread , mode )
 	elseif self:GetAccuracy() < 0.55 then
 		self:SetAccuracy( 0.55 )
 	end
-	
+
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, mode  ) then
 		return
 	end
-	
+
 	--Python: this is so goddamn lame
-	
-	local a=self:GetOwner():GetViewPunchAngles( ) 
-	a.p = a.p - 2 
+
+	local a=self:GetOwner():GetViewPunchAngles( )
+	a.p = a.p - 2
 	self:GetOwner():SetViewPunchAngles( a )
-	
+
 end

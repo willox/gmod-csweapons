@@ -18,8 +18,8 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MuzzleFlashScale"		"1.6"
 	"MuzzleFlashStyle"		"CS_MUZZLEFLASH_X"
 	"CanEquipWithShield"		"0"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"2"
 	"Damage"			"36"
@@ -32,7 +32,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MaxInaccuracy"			"1.25"
 	"TimeToIdle"			"1.9"
 	"IdleInterval"			"20"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00060
 	"InaccuracyCrouch"			0.00687
@@ -42,21 +42,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.10761
 	"InaccuracyFire"			0.01158
 	"InaccuracyMove"			0.09222
-								 
+
 	"RecoveryTimeCrouch"		0.34868
 	"RecoveryTimeStand"			0.48815
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_AK47"
 	"viewmodel"			"models/weapons/v_rif_ak47.mdl"
 	"playermodel"			"models/weapons/w_rif_ak47.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"0"
 	"bucket_position"		"0"
 
 	"clip_size"			"30"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_762MM"
 	"secondary_ammo"		"None"
 
@@ -79,7 +79,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"B"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"B"
 		}
@@ -130,26 +130,18 @@ end
 
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
-	--Jvs: valve sure is good at pulling values out of their ass
-	
-	if not self:GetOwner():OnGround() then
-		self:GunFire( 0.04 + 0.4 * self:GetAccuracy() )
-	elseif self:GetOwner():GetAbsVelocity():Length2D() > 140 then
-		self:GunFire( 0.04 + 0.07 * self:GetAccuracy() )
-	else
-		self:GunFire( 0.0275 * self:GetAccuracy() )
-	end
+
+	self:GunFire( self:BuildSpread() )
 end
 
 function SWEP:GunFire( spread )
-	
+
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
 		return
 	end
-	
+
 	--Jvs: this is so goddamn lame
-	
+
 	if self:GetOwner():GetAbsVelocity():Length2D() > 5 then
 		self:KickBack( 1.5, 0.45, 0.225, 0.05, 6.5, 2.5, 7 )
 	elseif not self:GetOwner():OnGround() then

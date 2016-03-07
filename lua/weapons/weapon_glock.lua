@@ -14,7 +14,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"BuiltRightHanded"		"0"
 	"PlayerAnimationExtension" 	"pistol"
 	"MuzzleFlashScale"		"1.0"
-	
+
 	"CanEquipWithShield"		"1"
 
 
@@ -25,7 +25,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"RangeModifier"			"0.75"
 	"Bullets"			"1"
 	"CycleTime"			"0.15"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00400
 	"InaccuracyCrouch"			0.00750
@@ -35,7 +35,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.01850
 	"InaccuracyFire"			0.03167
 	"InaccuracyMove"			0.01665
-								
+
 	"SpreadAlt"					0.00400
 	"InaccuracyCrouchAlt"		0.00750
 	"InaccuracyStandAlt"		0.01000
@@ -44,21 +44,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadderAlt"		0.01850
 	"InaccuracyFireAlt"			0.02217
 	"InaccuracyMoveAlt"			0.01665
-								 
+
 	"RecoveryTimeCrouch"		0.21875
 	"RecoveryTimeStand"			0.26249
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_Glock18"
 	"viewmodel"			"models/weapons/v_pist_glock18.mdl"
 	"playermodel"			"models/weapons/w_pist_glock18.mdl"
-	"shieldviewmodel"		"models/weapons/v_shield_glock18_r.mdl"	
+	"shieldviewmodel"		"models/weapons/v_shield_glock18_r.mdl"
 	"anim_prefix"			"anim"
 	"bucket"			"1"
 	"bucket_position"		"1"
 
 	"clip_size"			"20"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_9MM"
 	"secondary_ammo"		"None"
 
@@ -82,7 +82,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"C"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"C"
 		}
@@ -135,38 +135,16 @@ function SWEP:Initialize()
 end
 
 function SWEP:Deploy()
-	
+
 	self:SetAccuracy( 0.9 )
-	
+
 	return BaseClass.Deploy( self )
 end
 
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
-	if self:GetBurstFireEnabled() then
-		--[[if not self:GetOwner():OnGround() then
-			self:GunFire( 1.2 * ( 1- self:GetAccuracy()), true )
-		elseif self:GetOwner():GetAbsVelocity():Length2D() > 5 then
-			self:GunFire( 0.185 * ( 1- self:GetAccuracy()), true )
-		elseif self:GetOwner():Crouching() then
-			self:GunFire( 0.095 * ( 1- self:GetAccuracy()), true )
-		else
-			self:GunFire( 0.3 * ( 1- self:GetAccuracy()), true )
-		end
-		]]
-		self:GunFire( 0.05 , false )	--thanks valve!
-	else
-		if not self:GetOwner():OnGround() then
-			self:GunFire( 1.0 * ( 1- self:GetAccuracy()), true )
-		elseif self:GetOwner():GetAbsVelocity():Length2D() > 5 then
-			self:GunFire( 0.165 * ( 1- self:GetAccuracy()), true )
-		elseif self:GetOwner():Crouching() then
-			self:GunFire( 0.075 * ( 1- self:GetAccuracy()), true )
-		else
-			self:GunFire( 0.1 * ( 1- self:GetAccuracy()), true )
-		end
-	end
+
+	self:GunFire(self:BuildSpread(), self:GetBurstFireEnabled())
 end
 
 function SWEP:TranslateViewModelActivity( act )
@@ -178,7 +156,7 @@ function SWEP:TranslateViewModelActivity( act )
 end
 
 function SWEP:GunFire( spread , mode )
-	
+
 	self:SetAccuracy( self:GetAccuracy() - 0.275 * ( 0.325 - CurTime() - self:GetLastFire() ) )
 
 	if self:GetAccuracy() > 0.9 then
@@ -186,13 +164,13 @@ function SWEP:GunFire( spread , mode )
 	elseif self:GetAccuracy() < 0.6 then
 		self:SetAccuracy( 0.6 )
 	end
-	
+
 	self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, mode  )
 end
 
 function SWEP:SecondaryAttack()
 	if self:GetNextSecondaryAttack() > CurTime() then return end
-	
+
 	self:ToggleBurstFire()
 	self:SetNextSecondaryAttack( CurTime() + 0.3 )
 end

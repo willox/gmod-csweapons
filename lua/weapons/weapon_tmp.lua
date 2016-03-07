@@ -1,4 +1,4 @@
-AddCSLuaFile() 
+AddCSLuaFile()
 DEFINE_BASECLASS( "weapon_csbasegun" )
 
 CSParseWeaponInfo( SWEP , [[WeaponData
@@ -15,10 +15,10 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"PlayerAnimationExtension"	"tmp"
 	"MuzzleFlashScale"		"0.8"
 	"MuzzleFlashStyle"		"CS_MUZZLEFLASH_NONE"
-	
+
 	"CanEquipWithShield"		"0"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"1"
 	"Damage"			"26"
@@ -31,7 +31,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MaxInaccuracy"			"1.4"
 	"TimeToIdle"			"2"
 	"IdleInterval"			"20"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00100
 	"InaccuracyCrouch"			0.01500
@@ -41,21 +41,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.02795
 	"InaccuracyFire"			0.01594
 	"InaccuracyMove"			0.00389
-								 
+
 	"RecoveryTimeCrouch"		0.15131
 	"RecoveryTimeStand"			0.21184
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_Tmp"
 	"viewmodel"			"models/weapons/v_smg_tmp.mdl"
 	"playermodel"			"models/weapons/w_smg_tmp.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"0"
 	"bucket_position"		"0"
 
 	"clip_size"			"30"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_9MM"
 	"secondary_ammo"		"None"
 
@@ -79,7 +79,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"D"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"D"
 		}
@@ -130,20 +130,16 @@ end
 
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
-	if not self:GetOwner():OnGround() then
-		self:GunFire( .25 * self:GetAccuracy() )
-	else
-		self:GunFire( .03 * self:GetAccuracy() )
-	end
+
+	self:GunFire(self:BuildSpread())
 end
 
 function SWEP:GunFire( spread )
-	
+
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
 		return
 	end
-	
+
 	if not self:GetOwner():OnGround() then
 		self:KickBack( 1.1, 0.5, 0.35, 0.045, 4.5, 3.5, 6 )
 	elseif self:GetOwner():GetAbsVelocity():Length2D() > 5 then

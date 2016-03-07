@@ -3,7 +3,7 @@ DEFINE_BASECLASS( "weapon_csbasegun" )
 
 CSParseWeaponInfo( SWEP , [[WeaponData
 {
-	"MaxPlayerSpeed"		"220" 
+	"MaxPlayerSpeed"		"220"
 	"WeaponType"			"Machinegun"
 	"FullAuto"				1
 	"WeaponPrice"			"5750"
@@ -17,7 +17,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MuzzleFlashStyle"		"CS_MUZZLEFLASH_X"
 	"CanEquipWithShield" 		"0"
 
-	
+
 	// Weapon characteristics:
 	"Penetration"			"2"
 	"Damage"			"35"
@@ -30,7 +30,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MaxInaccuracy"			"0.9"
 	"TimeToIdle"			"1.6"
 	"IdleInterval"			"20"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00200
 	"InaccuracyCrouch"			0.00763
@@ -40,21 +40,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.13281
 	"InaccuracyFire"			0.00427
 	"InaccuracyMove"			0.10618
-								 
+
 	"RecoveryTimeCrouch"		0.55920
 	"RecoveryTimeStand"			0.78288
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_M249"
 	"viewmodel"			"models/weapons/v_mach_m249para.mdl"
 	"playermodel"			"models/weapons/w_mach_m249para.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"0"
 	"bucket_position"		"0"
 
 	"clip_size"			"100"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_556MM_BOX"
 	"secondary_ammo"		"None"
 
@@ -79,7 +79,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"Z"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"Z"
 		}
@@ -130,24 +130,16 @@ end
 
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
-	--Jvs: valve sure is good at pulling values out of their ass
-	
-	if not self:GetOwner():OnGround() then
-		self:GunFire( 0.045 + 0.5 * self:GetAccuracy() )
-	elseif self:GetOwner():GetAbsVelocity():Length2D() > 140 then
-		self:GunFire( 0.045 + 0.095 * self:GetAccuracy() )
-	else
-		self:GunFire( 0.03 * self:GetAccuracy() )
-	end
+
+	self:GunFire( self:BuildSpread() )
 end
 
 function SWEP:GunFire( spread )
-	
+
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
 		return
 	end
-	
+
 	if self:GetOwner():GetAbsVelocity():Length2D() > 5 then
 		self:KickBack( 1.1, 0.5, 0.3, 0.06, 4, 3, 8)
 	elseif not self:GetOwner():OnGround() then

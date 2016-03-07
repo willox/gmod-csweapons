@@ -16,8 +16,8 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MuzzleFlashScale"		"1.2"
 	"MuzzleFlashStyle"		"CS_MUZZLEFLASH_X"
 	"CanEquipWithShield"		"0"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"1"
 	"Damage"			"26"
@@ -31,7 +31,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MaxInaccuracy"			"1.0"
 	"TimeToIdle"			"2"
 	"IdleInterval"			"20"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00100
 	"InaccuracyCrouch"			0.01463
@@ -41,21 +41,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.04124
 	"InaccuracyFire"			0.00732
 	"InaccuracyMove"			0.01062
-								 
+
 	"RecoveryTimeCrouch"		0.23289
 	"RecoveryTimeStand"			0.32605
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_P90"
 	"viewmodel"			"models/weapons/v_smg_p90.mdl"
 	"playermodel"			"models/weapons/w_smg_p90.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"0"
 	"bucket_position"		"0"
 
 	"clip_size"			"50"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_57MM"
 	"secondary_ammo"		"None"
 
@@ -79,7 +79,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"M"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"M"
 		}
@@ -130,22 +130,16 @@ end
 
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
-	if not self:GetOwner():OnGround() then
-		self:GunFire( 0.3 * self:GetAccuracy() )
-	elseif self:GetOwner():GetAbsVelocity():Length2D() > 170 then
-		self:GunFire( 0.115 * self:GetAccuracy() )
-	else
-		self:GunFire( 0.045 * self:GetAccuracy() )
-	end
+
+	self:GunFire( self:BuildSpread() )
 end
 
 function SWEP:GunFire( spread )
-	
+
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
 		return
 	end
-	
+
 	if self:GetOwner():GetAbsVelocity():Length2D() > 5 then
 		self:KickBack( 0.45, 0.3, 0.2, 0.0275, 4, 2.25, 7 )
 	elseif not self:GetOwner():OnGround() then

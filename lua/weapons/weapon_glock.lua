@@ -124,6 +124,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 }]] )
 
 SWEP.Spawnable = true
+SWEP.Slot = 1
 
 function SWEP:Initialize()
 	BaseClass.Initialize( self )

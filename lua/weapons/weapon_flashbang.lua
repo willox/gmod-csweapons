@@ -104,6 +104,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 }]] )
 
 SWEP.Spawnable = true
+SWEP.Slot = 4
 
 function SWEP:EmitGrenade( vecSrc , vecAngles , vecVel , angImpulse , pPlayer )
 	local pGrenade = ents.Create( self.ProjectileClass )

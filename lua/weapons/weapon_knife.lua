@@ -103,6 +103,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 }]])
 
 SWEP.Spawnable = true
+SWEP.Slot = 2
 
 SWEP.HeadHullMins = Vector( -16, -16, -18 )
 SWEP.HeadHullMaxs = Vector( 16, 16, 18 )

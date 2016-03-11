@@ -128,6 +128,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 }]] )
 
 SWEP.Spawnable = true
+SWEP.Slot = 1
 
 SWEP.SilencedTranslation = {
 	[ACT_VM_RELOAD] = ACT_VM_RELOAD_SILENCED,

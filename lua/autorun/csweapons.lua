@@ -385,7 +385,22 @@ if CLIENT then
 	f"xm1014"
 	f"C4"
 
-
+	-- Ammos
+	for str,trans in next,{
+	["50AE"] = "50 ae",
+	["762MM"] = "762 mm",
+	["556MM"] = "556 mm",
+	["556MM_BOX"] ="556mm Box", 
+	["338MAG"] = "338 Mag",
+	["9MM"] = "9 mm",
+	["BUCKSHOT"] = "Buckshot",
+	["45ACP"] = "45 acp",
+	["357SIG"] = "357 sig",
+	["57MM"] = 	"57 mm",
+	}
+	do
+		language.Add("BULLET_PLAYER_"..str..'_ammo',trans)
+	end
 
 	spawnmenu.AddContentType( "cssweapon", function( container, obj )
 
@@ -405,35 +420,30 @@ if CLIENT then
 			icon.Label:Dock( BOTTOM )
 			icon.Label:SetContentAlignment( 2 )
 			icon.Label:DockMargin( 4, 0, 4, 10 )
-			icon.Label:SetTextColor( Color( 255, 255, 255, 255 ) )
+			icon.Label:SetTextColor( wep.AdminOnly and Color( 255, 50, 50, 255 ) or Color( 255, 255, 255, 255 ) )
 			icon.Label:SetExpensiveShadow( 1, Color( 0, 0, 0, 200 ) )
 			icon.Label:SetText(obj.nicename)
 
-						icon.DoClick = function()
+			icon.DoClick = function()
+				RunConsoleCommand( "gm_giveswep", obj.spawnname )
+				surface.PlaySound( "ui/buttonclickrelease.wav" )
+			end
 
-													RunConsoleCommand( "gm_giveswep", obj.spawnname )
-													surface.PlaySound( "ui/buttonclickrelease.wav" )
+			icon.DoMiddleClick = function()
+				RunConsoleCommand( "gm_spawnswep", obj.spawnname )
+				surface.PlaySound( "ui/buttonclickrelease.wav" )
+			end
 
-											end
+			icon.OpenMenu = function( icon )
 
-					icon.DoMiddleClick = function()
+				local menu = DermaMenu()
+						menu:AddOption( "Copy to Clipboard", function() SetClipboardText( obj.spawnname ) end )
+						menu:AddOption( "Spawn Using Toolgun", function() RunConsoleCommand( "gmod_tool", "creator" ) RunConsoleCommand( "creator_type", "3" ) RunConsoleCommand( "creator_name", obj.spawnname ) end )
+						menu:AddSpacer()
+						menu:AddOption( "Delete", function() icon:Remove() hook.Run( "SpawnlistContentChanged", icon ) end )
+				menu:Open()
 
-													RunConsoleCommand( "gm_spawnswep", obj.spawnname )
-													surface.PlaySound( "ui/buttonclickrelease.wav" )
-
-											end
-
-
-					icon.OpenMenu = function( icon )
-
-													local menu = DermaMenu()
-															menu:AddOption( "Copy to Clipboard", function() SetClipboardText( obj.spawnname ) end )
-															menu:AddOption( "Spawn Using Toolgun", function() RunConsoleCommand( "gmod_tool", "creator" ) RunConsoleCommand( "creator_type", "3" ) RunConsoleCommand( "creator_name", obj.spawnname ) end )
-															menu:AddSpacer()
-															menu:AddOption( "Delete", function() icon:Remove() hook.Run( "SpawnlistContentChanged", icon ) end )
-													menu:Open()
-
-													end
+			end
 
 
 			if ( IsValid( container ) ) then

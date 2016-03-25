@@ -106,6 +106,12 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 SWEP.Spawnable = true
 SWEP.Slot = 4
 
+function SWEP:Initialize()
+	BaseClass.Initialize( self )
+	--self:SetHoldType( "ar2" )
+	self:SetWeaponID( CS_WEAPON_FLASHBANG )
+end
+
 function SWEP:EmitGrenade( vecSrc , vecAngles , vecVel , angImpulse , pPlayer )
 	local pGrenade = ents.Create( self.ProjectileClass )
 	if not pGrenade then return end
@@ -125,3 +131,5 @@ function SWEP:EmitGrenade( vecSrc , vecAngles , vecVel , angImpulse , pPlayer )
 	
 end
 
+
+SWEP.AdminOnly = true

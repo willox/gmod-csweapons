@@ -1,7 +1,5 @@
 AddCSLuaFile()
-local function FloatEquals(x,y)
-	return math.abs(x-y) < 1.19209290E-07
-end
+local function FloatEquals(x,y) return math.abs(x-y) < 1.19209290E-07 end
 
 DEFINE_BASECLASS "weapon_csbasegun"
 

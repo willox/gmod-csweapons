@@ -125,7 +125,7 @@ SWEP.Slot = 0
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
 	self:SetHoldType( "ar2" )
-	self:SetWeaponID( CS_WEAPON_P90 )
+	self:SetWeaponID( CS_WEAPON_MAC10 )
 end
 
 function SWEP:PrimaryAttack()

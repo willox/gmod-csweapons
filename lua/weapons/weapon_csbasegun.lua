@@ -395,7 +395,7 @@ function SWEP:GetPenetrationFromBullet()
 		fPenetrationPower = 30;
 		flPenetrationDistance = 2000.0;
 	else
-		Assert( false );
+		assert( false );
 		fPenetrationPower = 0;
 		flPenetrationDistance = 0.0;
 	end

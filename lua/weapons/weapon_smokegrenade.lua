@@ -1,5 +1,7 @@
 AddCSLuaFile()
-DEFINE_BASECLASS( "weapon_csbasegun" )
+DEFINE_BASECLASS( "weapon_basecsgrenade" )
+
+SWEP.ProjectileClass = "smokegrenade_projectile"
 
 CSParseWeaponInfo( SWEP , [[WeaponData
 {
@@ -103,35 +105,32 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 }]] )
 
 SWEP.Spawnable = true
-SWEP.Slot = 0
+SWEP.Slot = 4
 
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
-	self:SetHoldType( "ar2" )
-	self:SetWeaponID( CS_WEAPON_P90 )
+	--self:SetHoldType( "ar2" )
+	self:SetWeaponID( CS_WEAPON_SMOKEGRENADE )
 end
 
-function SWEP:PrimaryAttack()
-	if self:GetNextPrimaryAttack() > CurTime() then return end
-
-	self:GunFire( self:BuildSpread() )
+function SWEP:EmitGrenade( vecSrc , vecAngles , vecVel , angImpulse , pPlayer )
+	local pGrenade = ents.Create( self.ProjectileClass )
+	if not pGrenade then return end
+	
+	pGrenade:Spawn()
+	pGrenade:SetOwner( pPlayer )
+	pGrenade:SetPos( vecSrc )
+	pGrenade:SetAngles( vecAngles )
+	pGrenade:SetVelocity( vecVel )
+	pGrenade:SetInitialVelocity( vecVel )
+	
+	
+	pGrenade:SetThrower( pPlayer )
+	pGrenade:SetDamage( 100 )
+	pGrenade:SetDetonateTimerLength( 1.5 )
+	pGrenade:SetLocalAngularVelocity( angImpulse:Angle() + pGrenade:GetLocalAngularVelocity() )
+	
 end
 
-function SWEP:GunFire( spread )
-
-	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
-		return
-	end
-
-	if self:GetOwner():GetAbsVelocity():Length2D() > 5 then
-		self:KickBack( 0.45, 0.3, 0.2, 0.0275, 4, 2.25, 7 )
-	elseif not self:GetOwner():OnGround() then
-		self:KickBack( 0.9, 0.45, 0.35, 0.04, 5.25, 3.5, 4 )
-	elseif self:GetOwner():Crouching() then
-		self:KickBack( 0.275, 0.2, 0.125, 0.02, 3, 1, 9 )
-	else
-		self:KickBack( 0.3, 0.225, 0.125, 0.02, 3.25, 1.25, 8 )
-	end
-end
 
 SWEP.AdminOnly = true

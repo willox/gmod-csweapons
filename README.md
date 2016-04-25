@@ -6,7 +6,7 @@ This addon tries to faithfully recreate the counter strike source weapons we all
 
 The code we use to replicate these weapons is really outdated, so it doesn't contain the latest balance changes and recoils/spread patterns from the current CS:S.
 
-If you need to submit a pull request, please don't use garry's style of coding ( using unnecessary brackets in ifs, adding ; everywhere, ! && || instead of not and or), it's incredibly annoying to read and we don't care if garry , acecool or robotboy want to endorse it.
+If you need to submit a pull request, please don't use garry's style of coding ( using unnecessary brackets in ifs, adding ; everywhere, ! && || instead of not and or), it's incredibly annoying to read and we don't care if garry , acecool or robotboy want to endorse it. If you see these being used when you are updating/changing the code feel free to change it.
 
 Most of the code is a straight port from c++, so the naming convention for variables is not exactly consistent ( mostly Jvs' fault )
 
@@ -14,19 +14,11 @@ Most of the code is a straight port from c++, so the naming convention for varia
 
 Progress so far:
 
-CSBase completed.
+Bases are completed.
 
-CSBaseGun is missing bullet penetration, zooming and shotgun related code.
+All weapons besides the glock are completed.
 
-AK47 completed.
-
-M249 completed.
-
-M4A1 completed.
-
-USP45 completed.
-
-P90 completed.
+Flashbang is completed.
 
 Glock almost completed, only the burstfire needs to be the same as the original.
 

@@ -18,8 +18,8 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MuzzleFlashScale"		"1.3"
 	"MuzzleFlashStyle"		"CS_MUZZLEFLASH_X"
 	"CanEquipWithShield"		"0"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"2"
 	"Damage"			"32"
@@ -32,7 +32,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MaxInaccuracy"			"1.0"
 	"TimeToIdle"			"1.9"
 	"IdleInterval"			"20"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00060
 	"InaccuracyCrouch"			0.00412
@@ -42,7 +42,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.09234
 	"InaccuracyFire"			0.01090
 	"InaccuracyMove"			0.07268
-								 
+
 	"SpreadAlt"					0.00060
 	"InaccuracyCrouchAlt"		0.00288
 	"InaccuracyStandAlt"		0.00385
@@ -51,21 +51,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadderAlt"		0.09234
 	"InaccuracyFireAlt"			0.01090
 	"InaccuracyMoveAlt"			0.07268
-								 
+
 	"RecoveryTimeCrouch"		0.30263
 	"RecoveryTimeStand"			0.42368
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_Aug"
 	"viewmodel"			"models/weapons/v_rif_aug.mdl"
 	"playermodel"			"models/weapons/w_rif_aug.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"0"
 	"bucket_position"		"0"
 
 	"clip_size"			"30"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_762MM"
 	"secondary_ammo"		"None"
 
@@ -89,7 +89,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"E"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"E"
 		}
@@ -135,13 +135,14 @@ SWEP.Slot = 0
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
 	self:SetHoldType( "ar2" )
-	self:SetWeaponID( CS_WEAPON_AWP )
+	self:SetWeaponID( CS_WEAPON_AUG )
 end
 
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
 
 	self:GunFire(self:BuildSpread())
+
 end
 
 function SWEP:SecondaryAttack()
@@ -221,13 +222,6 @@ function SWEP:GunFire( spread )
 
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
 		return
-	end
-
-	if (self:IsScoped()) then
-		self:SetLastZoom(self:GetTargetFOVRatio());
-
-		self:SetResumeZoom(true);
-		self:SetFOVRatio( 1, 0.1 );
 	end
 
 	local a = self:GetOwner():GetViewPunchAngles( )

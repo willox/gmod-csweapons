@@ -19,8 +19,8 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MuzzleFlashScale"		"1.6"
 	"MuzzleFlashStyle"		"CS_MUZZLEFLASH_X"
 	"CanEquipWithShield"		"0"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"2"
 	"Damage"			"70"
@@ -43,7 +43,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.10932
 	"InaccuracyFire"			0.03829
 	"InaccuracyMove"			0.21864
-								 
+
 	"SpreadAlt"					0.00030
 	"InaccuracyCrouchAlt"		0.00150
 	"InaccuracyStandAlt"		0.00200
@@ -52,21 +52,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadderAlt"		0.10932
 	"InaccuracyFireAlt"			0.03829
 	"InaccuracyMoveAlt"			0.21864
-								 
+
 	"RecoveryTimeCrouch"		0.20970
 	"RecoveryTimeStand"			0.29358
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_SG550"
 	"viewmodel"			"models/weapons/v_snip_sg550.mdl"
 	"playermodel"			"models/weapons/w_snip_sg550.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"0"
 	"bucket_position"		"0"
 
 	"clip_size"			"30"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_556MM"
 	"secondary_ammo"		"None"
 
@@ -91,7 +91,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"O"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"O"
 		}
@@ -131,7 +131,7 @@ SWEP.Slot = 0
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
 	self:SetHoldType( "ar2" )
-	self:SetWeaponID( CS_WEAPON_AWP )
+	self:SetWeaponID( CS_WEAPON_SG550 )
 end
 
 function SWEP:PrimaryAttack()
@@ -217,13 +217,6 @@ function SWEP:GunFire( spread )
 
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
 		return
-	end
-
-	if (self:IsScoped()) then
-		self:SetLastZoom(self:GetTargetFOVRatio());
-
-		self:SetResumeZoom(true);
-		self:SetFOVRatio( 1, 0.1 );
 	end
 
 	local a = self:GetOwner():GetViewPunchAngles( )

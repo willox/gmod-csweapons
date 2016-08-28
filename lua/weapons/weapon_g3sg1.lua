@@ -223,6 +223,3 @@ function SWEP:GunFire( spread )
 	a.p = a.p - 2
 	self:GetOwner():SetViewPunchAngles( a )
 end
-
-
-SWEP.AdminOnly = true

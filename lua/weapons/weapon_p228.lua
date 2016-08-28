@@ -3,7 +3,7 @@ DEFINE_BASECLASS( "weapon_csbasegun" )
 
 CSParseWeaponInfo( SWEP , [[WeaponData
 {
-	"MaxPlayerSpeed" 		"250" 
+	"MaxPlayerSpeed" 		"250"
 	"WeaponType" 			"Pistol"
 	"FullAuto"				0
 	"WeaponPrice" 			"600"
@@ -14,10 +14,10 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"BuiltRightHanded"		"0"
 	"PlayerAnimationExtension" 	"pistol"
 	"MuzzleFlashScale"		"1"
-	
+
 	"CanEquipWithShield"		"1"
-	
-			
+
+
 	// Weapon characteristics:
 	"Penetration"			"1"
 	"Damage"			"40"
@@ -25,7 +25,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"RangeModifier"			"0.8"
 	"Bullets"			"1"
 	"CycleTime"			"0.15"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00400
 	"InaccuracyCrouch"			0.00825
@@ -35,21 +35,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.01900
 	"InaccuracyFire"			0.03318
 	"InaccuracyMove"			0.01710
-								 
+
 	"RecoveryTimeCrouch"		0.23026
 	"RecoveryTimeStand"			0.27631
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_P228"
 	"viewmodel"			"models/weapons/v_pist_p228.mdl"
-	"shieldviewmodel"		"models/weapons/v_shield_p228_r.mdl"	
+	"shieldviewmodel"		"models/weapons/v_shield_p228_r.mdl"
 	"playermodel"			"models/weapons/w_pist_p228.mdl"
 	"anim_prefix"			"anim"
 	"bucket"			"1"
 	"bucket_position"		"1"
 
 	"clip_size"			"13"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_357SIG"
 	"secondary_ammo"		"None"
 
@@ -73,7 +73,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"Y"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"Y"
 		}
@@ -145,5 +145,3 @@ function SWEP:GunFire( spread )
 		self:KickBack( 0.3, 0.225, 0.125, 0.02, 3.25, 1.25, 8 )
 	end
 end
-
-SWEP.AdminOnly = true

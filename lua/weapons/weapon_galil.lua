@@ -16,8 +16,8 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MuzzleFlashScale"		"1.6"
 	"MuzzleFlashStyle"		"CS_MUZZLEFLASH_X"
 	"CanEquipWithShield" 		"0"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"2"
 	"Damage"			"30"
@@ -30,7 +30,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MaxInaccuracy"			"1.25"
 	"TimeToIdle"			"1.28"
 	"IdleInterval"			"20"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00060
 	"InaccuracyCrouch"			0.00939
@@ -40,21 +40,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.11358
 	"InaccuracyFire"			0.00984
 	"InaccuracyMove"			0.10561
-								 
+
 	"RecoveryTimeCrouch"		0.35197
 	"RecoveryTimeStand"			0.49275
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_Galil"
 	"viewmodel"			"models/weapons/v_rif_galil.mdl"
 	"playermodel"			"models/weapons/w_rif_galil.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"0"
 	"bucket_position"		"0"
 
 	"clip_size"			"35"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_556MM"
 	"secondary_ammo"		"None"
 
@@ -79,7 +79,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"V"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"V"
 		}
@@ -151,5 +151,3 @@ function SWEP:GunFire( spread )
 		self:KickBack( 0.3, 0.225, 0.125, 0.02, 3.25, 1.25, 8 )
 	end
 end
-
-SWEP.AdminOnly = true

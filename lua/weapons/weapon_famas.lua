@@ -30,7 +30,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MaxInaccuracy"			"1.0"
 	"TimeToIdle"			"1.1"
 	"IdleInterval"			"20"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00060
 	"InaccuracyCrouch"			0.00412
@@ -40,7 +40,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.09132
 	"InaccuracyFire"			0.01186
 	"InaccuracyMove"			0.06980
-								 
+
 	"SpreadAlt"					0.00060
 	"InaccuracyCrouchAlt"		0.00412
 	"InaccuracyStandAlt"		0.00549
@@ -49,21 +49,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadderAlt"		0.09132
 	"InaccuracyFireAlt"			0.00593
 	"InaccuracyMoveAlt"			0.06980
-								 
+
 	"RecoveryTimeCrouch"		0.30328
 	"RecoveryTimeStand"			0.42460
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_Famas"
 	"viewmodel"			"models/weapons/v_rif_famas.mdl"
 	"playermodel"			"models/weapons/w_rif_famas.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"0"
 	"bucket_position"		"0"
 
 	"clip_size"			"25"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_556MM"
 	"secondary_ammo"		"None"
 
@@ -87,7 +87,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"T"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"T"
 		}
@@ -159,5 +159,3 @@ function SWEP:GunFire( spread )
 		self:KickBack( 0.3, 0.225, 0.125, 0.02, 3.25, 1.25, 8 )
 	end
 end
-
-SWEP.AdminOnly = true

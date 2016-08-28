@@ -145,5 +145,3 @@ function SWEP:GunFire( spread )
 		self:KickBack( 0.3, 0.225, 0.125, 0.02, 3.25, 1.25, 8 )
 	end
 end
-
-SWEP.AdminOnly = true

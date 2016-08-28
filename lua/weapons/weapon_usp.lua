@@ -164,7 +164,7 @@ end
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
 
-	self:GunFire(self:BuildSpread())
+	self:GunFire(self:BuildSpread(), not self:IsSilenced() )
 end
 
 function SWEP:TranslateViewModelActivity( act )

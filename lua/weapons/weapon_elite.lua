@@ -14,10 +14,10 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"BuiltRightHanded"		"0"
 	"PlayerAnimationExtension" 	"elites"
 	"MuzzleFlashScale"		"1"
-	
+
 	"CanEquipWithShield"		"0"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"		"1"
 	"Damage"			"45"
@@ -25,7 +25,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"RangeModifier"		"0.75"
 	"Bullets"			"1"
 	"CycleTime"			"0.12"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00400
 	"InaccuracyCrouch"			0.00600
@@ -35,10 +35,10 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.01975
 	"InaccuracyFire"			0.03162
 	"InaccuracyMove"			0.01778
-								 
+
 	"RecoveryTimeCrouch"		0.24753
 	"RecoveryTimeStand"			0.29703
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_Elites"
 	"viewmodel"			"models/weapons/v_pist_elite.mdl"
@@ -51,7 +51,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"bucket_position"		"1"
 
 	"clip_size"			"30"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_9MM"
 	"secondary_ammo"		"None"
 
@@ -73,7 +73,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"S"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"S"
 		}
@@ -119,7 +119,7 @@ SWEP.Slot = 0
 
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
-	self:SetHoldType( "ar2" )
+	self:SetHoldType( "duel" )
 	self:SetWeaponID( CS_WEAPON_ELITE )
 end
 

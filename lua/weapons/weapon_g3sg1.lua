@@ -19,8 +19,8 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MuzzleFlashScale"		"1.5"
 	"MuzzleFlashStyle"		"CS_MUZZLEFLASH_X"
 	"CanEquipWithShield" 		"0"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"3"
 	"Damage"			"80"
@@ -33,7 +33,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MaxInaccuracy"			"0"
 	"TimeToIdle"			"1.8"
 	"IdleInterval"			"60"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00030
 	"InaccuracyCrouch"			0.01935
@@ -43,7 +43,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.11639
 	"InaccuracyFire"			0.04989
 	"InaccuracyMove"			0.23279
-								 
+
 	"SpreadAlt"					0.00030
 	"InaccuracyCrouchAlt"		0.00150
 	"InaccuracyStandAlt"		0.00200
@@ -52,21 +52,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadderAlt"		0.11639
 	"InaccuracyFireAlt"			0.04989
 	"InaccuracyMoveAlt"			0.23279
-								 
+
 	"RecoveryTimeCrouch"		0.22245
 	"RecoveryTimeStand"			0.31142
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_G3SG1"
 	"viewmodel"			"models/weapons/v_snip_g3sg1.mdl"
 	"playermodel"			"models/weapons/w_snip_g3sg1.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"0"
 	"bucket_position"		"0"
 
 	"clip_size"			"20"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_762MM"
 	"secondary_ammo"		"None"
 
@@ -91,7 +91,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"I"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"I"
 		}
@@ -131,7 +131,7 @@ SWEP.Slot = 0
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
 	self:SetHoldType( "ar2" )
-	self:SetWeaponID( CS_WEAPON_AWP )
+	self:SetWeaponID( CS_WEAPON_G3SG1 )
 end
 
 function SWEP:PrimaryAttack()
@@ -217,13 +217,6 @@ function SWEP:GunFire( spread )
 
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
 		return
-	end
-
-	if (self:IsScoped()) then
-		self:SetLastZoom(self:GetTargetFOVRatio());
-
-		self:SetResumeZoom(true);
-		self:SetFOVRatio( 1, 0.1 );
 	end
 
 	local a = self:GetOwner():GetViewPunchAngles( )

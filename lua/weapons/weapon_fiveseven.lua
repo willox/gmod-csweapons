@@ -14,10 +14,10 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"BuiltRightHanded"		"0"
 	"PlayerAnimationExtension"	"pistol"
 	"MuzzleFlashScale"		"1"
-	
+
 	"CanEquipWithShield"		"1"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"1"
 	"Damage"			"25"
@@ -25,31 +25,31 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"RangeModifier"			"0.885"
 	"Bullets"			"1"
 	"CycleTime"			"0.15"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.00400
 	"InaccuracyCrouch"			0.00600
 	"InaccuracyStand"			0.01000
 	"InaccuracyJump"			0.25635
 	"InaccuracyLand"			0.05127
-	"InaccuracyLadder"			0.01709	
+	"InaccuracyLadder"			0.01709
 	"InaccuracyFire"			0.05883
 	"InaccuracyMove"			0.01538
-								 
+
 	"RecoveryTimeCrouch"		0.18628
 	"RecoveryTimeStand"			0.22353
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_FiveSeven"
 	"viewmodel"			"models/weapons/v_pist_fiveseven.mdl"
 	"playermodel"			"models/weapons/w_pist_fiveseven.mdl"
-	"shieldviewmodel"		"models/weapons/v_shield_fiveseven_r.mdl"	
+	"shieldviewmodel"		"models/weapons/v_shield_fiveseven_r.mdl"
 	"anim_prefix"			"anim"
 	"bucket"			"1"
 	"bucket_position"		"1"
 
 	"clip_size"			"20"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_57MM"
 	"secondary_ammo"		"None"
 
@@ -73,7 +73,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"U"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"U"
 		}
@@ -119,7 +119,7 @@ SWEP.Slot = 0
 
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
-	self:SetHoldType( "ar2" )
+	self:SetHoldType( "pistol" )
 	self:SetWeaponID( CS_WEAPON_FIVESEVEN )
 end
 

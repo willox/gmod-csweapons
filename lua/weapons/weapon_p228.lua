@@ -119,7 +119,7 @@ SWEP.Slot = 0
 
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
-	self:SetHoldType( "ar2" )
+	self:SetHoldType( "pistol" )
 	self:SetWeaponID( CS_WEAPON_P228 )
 end
 

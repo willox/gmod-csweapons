@@ -134,6 +134,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 
 SWEP.Spawnable = true
 SWEP.Slot = 0
+SWEP.SlotPos = 0
 
 SWEP.SilencedTranslation = {
 	[ACT_VM_RELOAD] = ACT_VM_RELOAD_SILENCED,
@@ -160,7 +161,7 @@ end
 
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
+
 	self:GunFire(self:BuildSpread())
 end
 

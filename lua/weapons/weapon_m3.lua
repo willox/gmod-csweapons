@@ -14,10 +14,10 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"BuiltRightHanded"		"0"
 	"PlayerAnimationExtension" 	"m3s90"
 	"MuzzleFlashScale"		"1.3"
-	
+
 	"CanEquipWithShield"		"0"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"1"
 	"Damage"			"26"
@@ -25,7 +25,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"RangeModifier"			"0.70"
 	"Bullets"			"9"
 	"CycleTime"			"0.88"
-	
+
 	// New accuracy model parameters
 	"Spread"					0.04000
 	"InaccuracyCrouch"			0.00750
@@ -35,21 +35,21 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"InaccuracyLadder"			0.07875
 	"InaccuracyFire"			0.04164
 	"InaccuracyMove"			0.04320
-								 
+
 	"RecoveryTimeCrouch"		0.29605
 	"RecoveryTimeStand"			0.41447
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_m3"
 	"viewmodel"			"models/weapons/v_shot_m3super90.mdl"
 	"playermodel"			"models/weapons/w_shot_m3super90.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"0"
 	"bucket_position"		"0"
 
 	"clip_size"			"8"
-	
+
 	"primary_ammo"			"BULLET_PLAYER_BUCKSHOT"
 	"secondary_ammo"		"None"
 
@@ -74,7 +74,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"K"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"K"
 		}
@@ -117,6 +117,8 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 
 
 SWEP.Spawnable = true
+SWEP.Slot = 0
+SWEP.SlotPos = 0
 
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
@@ -125,16 +127,16 @@ function SWEP:Initialize()
 end
 
 function SWEP:PrimaryAttack()
-	
+
 	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
+
 	local owner = self:GetOwner()
 	if owner:WaterLevel()==3 then
 		self:PlayEmptySound()
 		self:SetNextPrimaryAttack( CurTime() + 0.2 )
 		return false
 	end
-	
+
 		-- Out of ammo?
 	if self:Clip1() <= 0 then
 		self:PlayEmptySound()
@@ -169,7 +171,7 @@ function SWEP:PrimaryAttack()
 		Callback = function( hitent , trace , dmginfo )
 			--TODO: penetration
 			--unfortunately this can't be done with a static function or we'd need to set global variables for range and shit
-			
+
 			if flRangeModifier then
 				--Jvs: the damage modifier valve actually uses
 				local flCurrentDistance = trace.Fraction * pCSInfo.Range
@@ -181,7 +183,7 @@ function SWEP:PrimaryAttack()
 
 	self:DoFireEffects()
 	local cycletime = .875
-	
+
 	self:SetNextPrimaryAttack( CurTime() + cycletime )
 	self:SetNextSecondaryAttack( CurTime() + cycletime )
 
@@ -190,24 +192,24 @@ function SWEP:PrimaryAttack()
 	else
 		self:SetNextIdle( CurTime() + cycletime )
 	end
-	
+
 	self:SetLastFire( CurTime() )
 
 
 	local angle = self:GetOwner():GetViewPunchAngles()
 
-	
+
 	-- Update punch angles.
 	if not self:GetOwner():OnGround() then
-		
-		
-		angle.x = angle.x - util.SharedRandom( "M3PunchAngleGround" , 4, 6 ) 
-	
+
+
+		angle.x = angle.x - util.SharedRandom( "M3PunchAngleGround" , 4, 6 )
+
 	else
-	
-		
-		angle.x = angle.x - util.SharedRandom( "M3PunchAngle" , 8, 11 ) 
-	
+
+
+		angle.x = angle.x - util.SharedRandom( "M3PunchAngle" , 8, 11 )
+
 	end
 
 	self:GetOwner():SetViewPunchAngles( angle )

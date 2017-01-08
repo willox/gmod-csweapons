@@ -15,15 +15,15 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"MuzzleFlashScale"		"0"
 	"MuzzleFlashStyle"		"CS_MUZZLEFLASH_NONE"
 	"CanEquipWithShield"		"1"
-	
-	
+
+
 	// Weapon characteristics:
 	"Penetration"			"1"
 	"Damage"			"50"
 	"Range"				"4096"
 	"RangeModifier"			"0.99"
 	"Bullets"			"1"
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_Knife"
 	"viewmodel"			"models/weapons/v_knife_t.mdl"
@@ -58,7 +58,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"J"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"J"
 		}
@@ -104,6 +104,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 
 SWEP.Spawnable = true
 SWEP.Slot = 2
+SWEP.SlotPos = 0
 
 SWEP.HeadHullMins = Vector( -16, -16, -18 )
 SWEP.HeadHullMaxs = Vector( 16, 16, 18 )
@@ -114,12 +115,12 @@ local function FindHullIntersection( vecSrc, tr, mins, maxs, pEntity )
 	local 	minmaxs = {mins, maxs}
 	local	tmpTrace
 	local	vecHullEnd = tr.HitPos
-	
+
 	distance = 1e6
 
 	vecHullEnd = vecSrc + ( ( vecHullEnd - vecSrc ) * 2 )
 	tmpTrace = util.TraceLine { start = vecSrc, endpos = vecHullEnd, mask = MASK_SOLID, filter = pEntity }
-	
+
 	if tmpTrace.Fraction < 1 then
 		tr = tmpTrace
 		return
@@ -144,7 +145,7 @@ local function FindHullIntersection( vecSrc, tr, mins, maxs, pEntity )
 			end
 		end
 	end
-	
+
 	return tr
 end
 
@@ -175,32 +176,32 @@ end
 
 function SWEP:PrimaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
+
 	self:SwingOrStab( false )
 end
 
 function SWEP:SecondaryAttack()
 	if self:GetNextPrimaryAttack() > CurTime() then return end
-	
+
 	self:SwingOrStab( true )
 end
 
 function SWEP:Think()
-	
+
 	if self:GetSmackTime() > -1 and CurTime() > self:GetSmackTime() then
 		self:Smack()
 		self:SetSmackTime( -1 )
 	end
-	
+
 	BaseClass.Think( self )
 end
 
 function SWEP:SwingOrStab( bStab )
 	self:GetOwner():LagCompensation( true )
 	local pPlayer = self:GetOwner()
-	
+
 	local fRange = bStab and 32 or 48 -- knife range
-	
+
 	local vForward 	= pPlayer:GetAimVector()
 	local vecSrc	= pPlayer:EyePos()
 	local vecEnd	= vecSrc + vForward * fRange
@@ -213,11 +214,11 @@ function SWEP:SwingOrStab( bStab )
 			-- Calculate the point of intersection of the line (or hull) and the object we hit
 			-- This is and approximation of the "best" intersection
 			local pHit = tr.Entity
-			
+
 			if not IsValid( pHit ) then
 				tr = FindHullIntersection( vecSrc, tr, pPlayer:OBBMins(), pPlayer:OBBMaxs() , pPlayer )
 			end
-			
+
 			vecEnd = tr.HitPos	-- This is the point on the actual surface (the hull could have hit space)
 		end
 	end
@@ -230,27 +231,27 @@ function SWEP:SwingOrStab( bStab )
 
 	if bStab then
 		fPrimDelay = bDidHit and 1.1 or 1
-		
+
 	else -- swing
 		fPrimDelay = bDidHit and 0.5 or 0.4
 	end
-	
+
 	fSecDelay = fPrimDelay
-	
+
 	self:SendWeaponAnim( bDidHit and ACT_VM_PRIMARYATTACK or ACT_VM_MISSCENTER )
 	pPlayer:DoAttackEvent()
 
 	self:SetNextPrimaryAttack( CurTime() + fPrimDelay )
 	self:SetNextSecondaryAttack( CurTime() + fSecDelay )
 	self:SetNextIdle( CurTime() + 2 )
-	
+
 	if not bDidHit then
 		-- play wiff or swish sound
 		self:EmitSound( "Weapon_Knife.Slash" )
-	else	
+	else
 	-- play thwack, smack, or dong sound
 		local pEntity = tr.Entity
-		
+
 		local flDamage = 42
 
 		if bStab then
@@ -261,12 +262,12 @@ function SWEP:SwingOrStab( bStab )
 				--Jvs TODO: finish converting
 				local vecLOS = pEntity:GetPos() - pPlayer:GetPos()
 				vecLOS.z = 0
-				
+
 				vecLOS:Normalize()
-				
+
 				local vTragetForward2d = vTragetForward
 				vTragetForward2d.z = 0
-				
+
 				local flDot = vecLOS:Dot( vTragetForward2d )
 
 				--Triple the damage if we are stabbing them in the back.
@@ -279,7 +280,7 @@ function SWEP:SwingOrStab( bStab )
 				-- first swing does full damage
 				flDamage = 20
 			else
-				-- subsequent swings do less	
+				-- subsequent swings do less
 				flDamage = 15
 			end
 		end
@@ -298,7 +299,7 @@ function SWEP:SwingOrStab( bStab )
 		self:SetIsStab( bStab )
 		self:SetSmackTime( CurTime() + ( bStab and 0.2 or 0.1 ) )
 	--end
-	
+
 	self:GetOwner():LagCompensation( false )
 end
 
@@ -313,17 +314,17 @@ end
 
 function SWEP:Smack()
 	if self:GetHitEntity() == NULL then return end
-	
+
 	if self:GetHitEntity():IsPlayer() or self:GetHitEntity():IsNPC() then
 		self:EmitSound( self:GetIsStab() and "Weapon_Knife.Stab" or "Weapon_Knife.Hit" )
 	else
 		self:EmitSound( "Weapon_Knife.HitWall" )
 	end
-	
-	
+
+
 	self:SetHitEntity( NULL )
 	self:SetIsStab( false )
-	
+
 	--[[
 	CEffectData data
 	data.m_vOrigin = m_trHit.endpos
@@ -338,7 +339,7 @@ function SWEP:Smack()
 #endif
 
 	CPASFilter filter( data.m_vOrigin )
-	
+
 #ifndef CLIENT_DLL
 	filter.RemoveRecipient( GetPlayerOwner() )
 #endif
@@ -352,7 +353,7 @@ end
 
 function SWEP:Idle()
 	if self:GetNextIdle() > CurTime() then return end
-	
+
 	self:SetNextIdle( CurTime() + 20 )
 	self:SendWeaponAnim( ACT_VM_IDLE )
 end

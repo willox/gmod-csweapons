@@ -25,12 +25,12 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 	"Range"				"4096"
 	"RangeModifier"			"0.99"
 	"Bullets"			"1"
-	
+
 	// Weapon data is loaded by both the Game and Client DLLs.
 	"printname"			"#Cstrike_WPNHUD_HE_Grenade"
 	"viewmodel"			"models/weapons/v_eq_fraggrenade.mdl"
 	"playermodel"			"models/weapons/w_eq_fraggrenade.mdl"
-	
+
 	"anim_prefix"			"anim"
 	"bucket"			"3"
 	"bucket_position"		"1"
@@ -58,7 +58,7 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 				"character"	"H"
 		}
 		"weapon_s"
-		{	
+		{
 				"font"		"CSweapons"
 				"character"	"H"
 		}
@@ -105,7 +105,8 @@ CSParseWeaponInfo( SWEP , [[WeaponData
 }]] )
 
 SWEP.Spawnable = true
-SWEP.Slot = 4
+SWEP.Slot = 3
+SWEP.SlotPos = 3
 
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
@@ -116,20 +117,20 @@ end
 function SWEP:EmitGrenade( vecSrc , vecAngles , vecVel , angImpulse , pPlayer )
 	local pGrenade = ents.Create( self.ProjectileClass )
 	if not pGrenade then return end
-	
+
 	pGrenade:Spawn()
 	pGrenade:SetOwner( pPlayer )
 	pGrenade:SetPos( vecSrc )
 	pGrenade:SetAngles( vecAngles )
 	pGrenade:SetVelocity( vecVel )
 	pGrenade:SetInitialVelocity( vecVel )
-	
-	
+
+
 	pGrenade:SetThrower( pPlayer )
 	pGrenade:SetDamage( 100 )
 	pGrenade:SetDetonateTimerLength( 1.5 )
 	pGrenade:SetLocalAngularVelocity( angImpulse:Angle() + pGrenade:GetLocalAngularVelocity() )
-	
+
 end
 
 

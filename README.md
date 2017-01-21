@@ -1,5 +1,7 @@
 =====================================================
 
+[![Build Status](https://travis-ci.org/Metastruct/gmod-csweapons.svg?branch=master)](https://travis-ci.org/Metastruct/gmod-csweapons)
+
 Counter-Strike: Source-esque weapons for Garry's Mod.
 
 This addon tries to faithfully recreate the counter strike source weapons we all love ( and hate ) , while still providing a weapon base that can be used for custom counter strike weapons.

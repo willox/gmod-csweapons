@@ -70,6 +70,7 @@ function SWEP:HandleZoom()
 	-- And Scout.
 
 	local pPlayer = self:GetOwner()
+	if not pPlayer:IsValid() then return end
 
 	if ( (self:GetNextPrimaryAttack() <= CurTime()) and self:GetResumeZoom() ) then
 
@@ -200,6 +201,8 @@ end
 function SWEP:BaseGunFire( spread , cycletime , primarymode )
 
 	local pPlayer = self:GetOwner()
+
+	if not pPlayer:IsValid() then return false end -- this happens with certain addons
 	local pCSInfo = self:GetWeaponInfo()
 
 	self:SetDelayFire( true )
@@ -321,6 +324,7 @@ end
 function SWEP:BuildSpread()
 	local pCSInfo = self:GetWeaponInfo()
 	local pPlayer = self:GetOwner()
+	if not pPlayer:IsValid() then return end
 	local spread
 	if (not self:IsScoped() and not self:GetBurstFireEnabled() and not self:IsSilenced()) then
 		spread = pCSInfo.Spread +  (
@@ -581,7 +585,7 @@ if CLIENT then
 	--copied straight from weapon_base
 
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
-
+		if not self:GetOwner():IsValid() then return end
 		if event == 5001 or event == 5011 or event == 5021 or event == 5031 then
 			if self:IsSilenced() or self:IsScoped() then
 				return true

@@ -656,8 +656,8 @@ if CLIENT then
 			surface.DrawLine( x, 0, x, screenTall )
 
 			-- scope dust
-			surface.SetMaterial( self.ScopeDustTexture )
-			surface.DrawTexturedRect(x - ( ScrH() / 2 ) , 0 , ScrH() , ScrH())
+			--surface.SetMaterial( self.ScopeDustTexture )
+			--surface.DrawTexturedRect(x - ( ScrH() / 2 ) , 0 , ScrH() , ScrH())
 
 
 			-- scope arc

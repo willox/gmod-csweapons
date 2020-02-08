@@ -369,7 +369,7 @@ if CLIENT then
 	f("HE_Grenade","HE Grenade")
 	f"Knife"
 	f"M249"
-	f"m3"
+	f("m3","M3")
 	f"M4A1"
 	f"MAC10"
 	f"MP5"
@@ -382,7 +382,7 @@ if CLIENT then
 	f"Tmp"
 	f"UMP45"
 	f"USP45"
-	f"xm1014"
+	f("xm1014","XM1014")
 	f"C4"
 
 	-- Ammos

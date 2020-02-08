@@ -119,20 +119,35 @@ SWEP.Spawnable = true
 SWEP.Slot = 0
 SWEP.SlotPos = 0
 
+function SWEP:SetupDataTables()
+	BaseClass.SetupDataTables( self )
+	self:NetworkVar( "Int", 0, "SpecialReload" )
+end
+
 function SWEP:Initialize()
 	BaseClass.Initialize( self )
-	self:SetHoldType( "ar2" )
+	self:SetHoldType( "shotgun" )
 	self:SetWeaponID( CS_WEAPON_XM1014 )
+	self:SetSpecialReload( 0 )
 end
 
 function SWEP:PrimaryAttack()
+	local pPlayer = self.Owner
+	if not IsValid( pPlayer ) then return end
+
+	if pPlayer:WaterLevel() == 3 then
+		self:PlayEmptySound()
+		self:SetNextPrimaryFire( CurTime() + 0.15 )
+		return
+	end
+
 	if self:GetNextPrimaryAttack() > CurTime() then return end
 
 	self:GunFire( self:BuildSpread() )
+	self:SetSpecialReload( 0 )
 end
 
 function SWEP:GunFire( spread )
-
 	if not self:BaseGunFire( spread, self:GetWeaponInfo().CycleTime, true ) then
 		return
 	end
@@ -148,4 +163,65 @@ function SWEP:GunFire( spread )
 	end
 end
 
-SWEP.AdminOnly = true
+function SWEP:Reload()
+	local pPlayer = self.Owner
+	if not IsValid( pPlayer ) then return end
+
+	if pPlayer:GetAmmoCount( self.Primary.Ammo ) <= 0 or self:Clip1() >= self.Primary.ClipSize then return end
+	if self:GetNextPrimaryAttack() > CurTime() then return end
+
+	if self:GetSpecialReload() == 0 then
+		pPlayer:SetAnimation( PLAYER_RELOAD )
+		self:SendWeaponAnim( ACT_SHOTGUN_RELOAD_START )
+		self:SetSpecialReload( 1 )
+
+		self:SetNextPrimaryAttack( CurTime() + 0.5 )
+		self:SetNextIdle( CurTime() + 0.5 )
+		
+		-- DoAnimationEvent( PLAYERANIMEVENT_RELOAD_START ) - Missing event
+		return true
+	elseif self:GetSpecialReload() == 1 then
+		if self:GetNextIdle() > CurTime() then
+			return true
+		end
+
+		self:SetSpecialReload( 2 )
+		self:SendWeaponAnim( ACT_VM_RELOAD )
+		self:SetNextIdle( CurTime() + 0.5 )
+
+		if self:Clip1() >= 6 then
+			pPlayer:DoAnimationEvent( PLAYERANIMEVENT_RELOAD_END )
+		else
+			pPlayer:DoAnimationEvent( PLAYERANIMEVENT_RELOAD_LOOP )
+		end
+	else
+		self:SetClip1( self:Clip1() + 1 )
+		pPlayer:DoAnimationEvent( PLAYERANIMEVENT_RELOAD )
+		pPlayer:RemoveAmmo( 1, self.Primary.Ammo )
+		self:SetSpecialReload( 1 )
+	end
+
+	return true
+end
+
+function SWEP:Think()
+	local pPlayer = self.Owner
+	if not IsValid( pPlayer ) then return end
+
+	if self:GetNextIdle() < CurTime() then
+		if self:Clip1() == 0 and self:GetSpecialReload() == 0 and pPlayer:GetAmmoCount( self.Primary.Ammo ) ~= 0 then
+			self:Reload()
+		elseif self:GetSpecialReload() ~= 0 then
+			if self:Clip1() ~= 7 and pPlayer:GetAmmoCount( self.Primary.Ammo ) ~= 0 then
+				self:Reload()
+			else
+				self:SendWeaponAnim( ACT_SHOTGUN_RELOAD_FINISH )
+				self:SetSpecialReload( 0 )
+				self:SetNextIdle( CurTime() + 1 )
+			end
+		else
+			self:SendWeaponAnim( ACT_VM_IDLE )
+		end
+	end
+end
+SWEP.AdminOnly = false
